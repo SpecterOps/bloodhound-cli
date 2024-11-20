@@ -1,4 +1,4 @@
-module github.com/SpecterOps/BoodHound_CLI
+module github.com/SpecterOps/BloodHound_CLI
 
 go 1.17
 
