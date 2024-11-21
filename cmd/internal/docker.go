@@ -8,13 +8,14 @@ import (
 	"github.com/docker/docker/client"
 	"log"
 	"path/filepath"
+	"strings"
 )
 
 // Vars for tracking the list of BloodHound images
 // Used for filtering the list of containers returned by the Docker client
 var (
 	prodImages = []string{
-		"specterops/bloodhound", "neo4j:4.4", "postgres:16",
+		"docker.io/specterops/bloodhound", "docker.io/library/neo4j", "docker.io/library/postgres",
 	}
 	devImages = []string{
 		"specterops/bloodhound", "neo4j:4.4", "postgres:16",
@@ -187,8 +188,15 @@ func FetchLogs(containerName string, lines string) []string {
 	}
 	if len(containers) > 0 {
 		for _, container := range containers {
-			if container.Labels["name"] == containerName || containerName == "all" || container.Labels["name"] == "specterops/"+containerName {
-				logs = append(logs, fmt.Sprintf("\n*** Logs for `%s` ***\n\n", container.Labels["name"]))
+			imageName := container.Image
+			if colonIndex := strings.Index(imageName, ":"); colonIndex != -1 {
+				imageName = imageName[:colonIndex]
+			}
+			imageName = strings.TrimPrefix(imageName, "docker.io/specterops/")
+			imageName = strings.TrimPrefix(imageName, "docker.io/library/")
+
+			if strings.Contains(container.Image, containerName) {
+				logs = append(logs, fmt.Sprintf("\n*** Logs for `%s` ***\n\n", container.Image))
 				reader, err := cli.ContainerLogs(context.Background(), container.ID, types.ContainerLogsOptions{
 					ShowStdout: true,
 					ShowStderr: true,
@@ -235,7 +243,11 @@ func GetRunning() Containers {
 	}
 	if len(containers) > 0 {
 		for _, container := range containers {
-			if Contains(devImages, container.Image) || Contains(prodImages, container.Image) {
+			imageName := container.Image
+			if colonIndex := strings.Index(imageName, ":"); colonIndex != -1 {
+				imageName = imageName[:colonIndex]
+			}
+			if Contains(devImages, imageName) || Contains(prodImages, imageName) {
 				running = append(running, Container{
 					container.ID, container.Image, container.Status, container.Ports, container.Labels["name"],
 				})
