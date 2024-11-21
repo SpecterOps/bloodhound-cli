@@ -27,7 +27,6 @@ func Execute() {
 }
 
 func init() {
-	// Create or parse the Docker ``.env`` file
+	// Create or parse the Docker ``bloodhound.config.json`` file
 	env.ParseBloodHoundEnvironmentVariables()
-
 }

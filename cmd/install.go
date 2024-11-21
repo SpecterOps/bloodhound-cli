@@ -32,6 +32,6 @@ func installBloodHound(cmd *cobra.Command, args []string) {
 	if err != nil {
 		return
 	}
-	fmt.Println("[+] Starting development environment installation")
+	fmt.Println("[+] Starting BloodHound environment installation")
 	docker.RunDockerComposeInstall("docker-compose.yml")
 }
