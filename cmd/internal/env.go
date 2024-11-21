@@ -4,7 +4,7 @@ package internal
 // configuration of the BloodHound containers.
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -43,116 +43,97 @@ var bhEnv = viper.New()
 // Set sane defaults for a basic BloodHound deployment.
 // Defaults are geared towards a development environment.
 func setBloodHoundConfigDefaultValues() {
-	bhEnv.SetDefault("bloodhound_tag", "latest")
+	bhEnv.SetDefault("version", "1")
 
-	// Postgres auth configuration
-	bhEnv.SetDefault("postgres_user", "bloodhound")
-	bhEnv.SetDefault("postgres_password", GenerateRandomPassword(32, false))
-	bhEnv.SetDefault("postgres_db", "bloodhound")
-	bhEnv.SetDefault("postgres_db_host", "app-db")
+	// Initial user setup
+	bhEnv.SetDefault("default_admin.principal_name", "admin")
+	bhEnv.SetDefault("default_admin.bh_default_admin_password", GenerateRandomPassword(32, true))
 
-	// Auth string for Neo4j credentials
-	bhEnv.SetDefault("neo4j_user", "neo4j")
-	bhEnv.SetDefault("neo4j_secret", GenerateRandomPassword(32, false))
-	bhEnv.SetDefault("neo4j_host", "graph-db:7687/")
+	// Base config
+	bhEnv.SetDefault("bind_addr", "0.0.0.0:8080")
+	bhEnv.SetDefault("metrics_port", ":2112")
+	bhEnv.SetDefault("root_url", "http://127.0.0.1:8080/")
+	bhEnv.SetDefault("work_dir", "/opt/bloodhound/work")
+	bhEnv.SetDefault("log_level", "INFO")
+	bhEnv.SetDefault("log_path", "bloodhound.log")
+	bhEnv.SetDefault("collectors_base_path", "/etc/bloodhound/collectors")
 
-	// Allow upgrades of neo4j data (useful when importing external data)
-	bhEnv.SetDefault("neo4j_allow_upgrade", true)
+	// TLS config
+	bhEnv.SetDefault("tls.cert_file", "")
+	bhEnv.SetDefault("tls.key_file", "")
 
-	// Django settings// Port forward information
-	bhEnv.SetDefault("bloodhound_host", "127.0.0.1")
-	bhEnv.SetDefault("bloodhound_port", 8080)
-	bhEnv.SetDefault("postgres_port", 5432)
-	bhEnv.SetDefault("neo4j_db_port", 7687)
-	bhEnv.SetDefault("neo4j_web_port", "7474")
+	// Set some helpful aliases for common settings
+	bhEnv.RegisterAlias("default_password", "default_admin.bh_default_admin_password")
 }
 
-// WriteBloodHoundEnvironmentVariables writes the environment variables to the .env file.
+// WriteBloodHoundEnvironmentVariables writes the environment variables to the JSON config file.
 func WriteBloodHoundEnvironmentVariables() {
-	c := bhEnv.AllSettings()
-	// To make it easier to read and look at, get all the keys, sort them, and display variables in order
-	keys := make([]string, 0, len(c))
-	for k := range c {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	f, err := os.Create(filepath.Join(GetCwdFromExe(), ".env"))
+	checkJsonFileExistsAndCreate()
+	err := bhEnv.WriteConfig()
 	if err != nil {
-		log.Fatalf("Error writing out environment!\n%v", err)
+		log.Fatalf("Error while writing the JSON config file: %s", err)
 	}
-	defer f.Close()
-	for _, key := range keys {
-		if len(bhEnv.GetString(key)) == 0 {
-			_, err = f.WriteString(fmt.Sprintf("%s=\n", strings.ToUpper(key)))
-		} else {
-			_, err = f.WriteString(fmt.Sprintf("%s='%s'\n", strings.ToUpper(key), bhEnv.GetString(key)))
-		}
+}
+
+// checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
+func checkJsonFileExistsAndCreate() {
+	if !FileExists(filepath.Join(GetCwdFromExe(), "bloodhound.config.json")) {
+		file, err := os.Create(filepath.Join(GetCwdFromExe(), "ƒ"))
 
 		if err != nil {
-			log.Fatalf("Failed to write out environment!\n%v", err)
+			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
+		}
+
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				log.Fatalf("Failed to close file: %v", err)
+			}
+		}(file)
+
+		emptyJSON := make(map[string]interface{})
+		encoder := json.NewEncoder(file)
+		if err := encoder.Encode(emptyJSON); err != nil {
+			log.Fatalf("Failed to write JSON to file: %v", err)
 		}
 	}
 }
 
-// ParseBloodHoundEnvironmentVariables attempts to find and open an existing .env file or create a new one.
-// If an .env file is found, load it into the Viper configuration.
-// If an .env file is not found, create a new one with default values.
+// ParseBloodHoundEnvironmentVariables attempts to find and open an existing JSON config file or create a new one.
+// If a JSON config file is found, load it into the Viper configuration.
+// If a JSON config file is not found, create a new one with default values.
 // Then write the final file with `WriteBloodHoundEnvironmentVariables()`.
 func ParseBloodHoundEnvironmentVariables() {
 	setBloodHoundConfigDefaultValues()
-	bhEnv.SetConfigName(".env")
-	bhEnv.SetConfigType("env")
+	bhEnv.SetConfigName("bloodhound.config.json")
+	bhEnv.SetConfigType("json")
 	bhEnv.AddConfigPath(GetCwdFromExe())
 	bhEnv.AutomaticEnv()
 	// Check if expected env file exists
-	if !FileExists(filepath.Join(GetCwdFromExe(), ".env")) {
-		_, err := os.Create(filepath.Join(GetCwdFromExe(), ".env"))
-		if err != nil {
-			log.Fatalf("The .env doesn't exist and couldn't be created")
-		}
-	}
+	checkJsonFileExistsAndCreate()
 	// Try reading the env file
 	if err := bhEnv.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Fatalf("Error while reading in .env file: %s", err)
+			log.Fatalf("Error while reading in the JSON config file: %s", err)
 		} else {
-			log.Fatalf("Error while parsing .env file: %s", err)
+			log.Fatalf("Error while parsing the JSON config file: %s", err)
 		}
 	}
 	WriteBloodHoundEnvironmentVariables()
 }
 
-// SetProductionMode updates the environment variables to switch to production mode.
-func SetProductionMode() {
-	bhEnv.Set("hasura_graphql_dev_mode", false)
-	bhEnv.Set("django_secure_ssl_redirect", true)
-	bhEnv.Set("django_settings_module", "config.settings.production")
-	bhEnv.Set("django_csrf_cookie_secure", true)
-	bhEnv.Set("django_session_cookie_secure", true)
-	WriteBloodHoundEnvironmentVariables()
-}
-
-// GetConfigAll retrieves all values from the .env configuration file.
-func GetConfigAll() Configurations {
-	c := bhEnv.AllSettings()
-	keys := make([]string, 0, len(c))
-	for k := range c {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var values Configurations
-	for _, key := range keys {
-		val := bhEnv.GetString(key)
-		values = append(values, Configuration{strings.ToUpper(key), val})
+// GetConfigAll retrieves all values from the JSON config configuration file.
+func GetConfigAll() []byte {
+	configuration := bhEnv.AllSettings()
+	configJSON, err := json.MarshalIndent(configuration, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to marshal configuration to JSON: %v", err)
 	}
 
-	sort.Sort(values)
-
-	return values
+	return configJSON
 }
 
-// GetConfig retrieves the specified values from the .env file.
+// GetConfig retrieves the specified values from the JSON config file.
 func GetConfig(args []string) Configurations {
 	var values Configurations
 	for i := 0; i < len(args[0:]); i++ {
@@ -170,7 +151,7 @@ func GetConfig(args []string) Configurations {
 	return values
 }
 
-// SetConfig sets the value of the specified key in the .env file.
+// SetConfig sets the value of the specified key in the JSON config file.
 func SetConfig(key string, value string) {
 	if strings.ToLower(value) == "true" {
 		bhEnv.Set(key, true)

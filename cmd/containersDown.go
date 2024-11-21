@@ -21,6 +21,6 @@ func init() {
 
 func containersDown(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
-	fmt.Println("[+] Bringing down the development environment")
+	fmt.Println("[+] Bringing down the BloodHound environment")
 	docker.RunDockerComposeDown("docker-compose.yml")
 }

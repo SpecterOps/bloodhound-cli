@@ -82,7 +82,7 @@ func EvaluateDockerComposeStatus() error {
 
 	// Bail out if we're not in the same directory as the YAML files
 	// Otherwise, we'll get a confusing error message from the `compose` plugin
-	if !FileExists(filepath.Join(GetCwdFromExe(), "docker-compose.dev.yml")) || !FileExists(filepath.Join(GetCwdFromExe(), "docker-compose.yml")) {
+	if !FileExists(filepath.Join(GetCwdFromExe(), "docker-compose.yml")) {
 		log.Fatalln("BloodHound CLI must be run in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
 	}
 
@@ -92,7 +92,7 @@ func EvaluateDockerComposeStatus() error {
 // RunDockerComposeInstall executes the "docker compose" commands for a first-time installation with
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeInstall(yaml string) {
-	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "build"})
+	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if buildErr != nil {
 		log.Fatalf("Error trying to build with %s: %v\n", yaml, buildErr)
 	}
@@ -101,8 +101,8 @@ func RunDockerComposeInstall(yaml string) {
 		log.Fatalf("Error trying to bring up environment with %s: %v\n", yaml, upErr)
 	}
 	fmt.Println("[+] BloodHound is ready to go!")
-	fmt.Printf("[+] You can login as `%s` with this password: %s\n", bhEnv.GetString("django_superuser_username"), bhEnv.GetString("django_superuser_password"))
-	fmt.Println("[+] You can get your admin password by running: bloodhound-cli config get admin_password")
+	fmt.Printf("[+] You can login as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.bh_default_admin_password"))
+	fmt.Println("[+] You can get your admin password by running: bloodhound-cli config get default_password")
 }
 
 // RunDockerComposeUpgrade executes the "docker compose" commands for re-building or upgrading an

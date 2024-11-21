@@ -21,6 +21,6 @@ func init() {
 
 func containersStop(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
-	fmt.Println("[+] Stopping the development environment")
+	fmt.Println("[+] Stopping the BloodHound environment")
 	docker.RunDockerComposeStop("docker-compose.yml")
 }

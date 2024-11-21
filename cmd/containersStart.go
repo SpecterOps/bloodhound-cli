@@ -21,6 +21,6 @@ func init() {
 
 func containersStart(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
-	fmt.Println("[+] Starting the development environment")
+	fmt.Println("[+] Starting the BloodHound environment")
 	docker.RunDockerComposeStart("docker-compose.yml")
 }

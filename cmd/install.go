@@ -28,8 +28,10 @@ func init() {
 }
 
 func installBloodHound(cmd *cobra.Command, args []string) {
-	docker.EvaluateDockerComposeStatus()
+	err := docker.EvaluateDockerComposeStatus()
+	if err != nil {
+		return
+	}
 	fmt.Println("[+] Starting development environment installation")
-	docker.SetDevMode()
 	docker.RunDockerComposeInstall("docker-compose.yml")
 }
