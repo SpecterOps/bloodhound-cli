@@ -43,7 +43,7 @@ var bhEnv = viper.New()
 // Set sane defaults for a basic BloodHound deployment.
 // Defaults are geared towards a development environment.
 func setBloodHoundConfigDefaultValues() {
-	bhEnv.SetDefault("version", "1")
+	bhEnv.SetDefault("version", 1)
 
 	// Initial user setup
 	bhEnv.SetDefault("default_admin.principal_name", "admin")
