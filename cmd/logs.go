@@ -10,16 +10,13 @@ import (
 var logsCmd = &cobra.Command{
 	Use:   "logs <container>",
 	Short: "Fetch logs for BloodHound services",
-	Long: `Fetch logs for BloodHound services. Provide "all" or a container name.
+	Long: `Fetch logs for BloodHound services. Provide a container name.
 
 Valid names are:
 
-* django
-* nginx
-* postgres
-* redis
-* graphql
-* queue`,
+* bloodhound
+* neo4j
+* postgres`,
 	Args: cobra.ExactArgs(1),
 	Run:  readLogs,
 }
