@@ -29,7 +29,7 @@ func displayRunning(cmd *cobra.Command, args []string) {
 	// initialize tabwriter
 	writer := new(tabwriter.Writer)
 	// Set minwidth, tabwidth, padding, padchar, and flags
-	writer.Init(os.Stdout, 8, 8, 1, '\t', 0)
+	writer.Init(os.Stdout, 8, 8, 1, ' ', 0)
 
 	defer writer.Flush()
 
