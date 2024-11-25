@@ -9,8 +9,10 @@ import (
 
 func TestEvaluateDockerComposeStatus(t *testing.T) {
 	// Mock the BloodHound Docker YAML files
-	localMockYaml := filepath.Join(GetCwdFromExe(), "docker-compose.yml")
+	localMockYaml := filepath.Join(GetCwdFromExe(), "docker-compose.dev.yml")
 	local, localErr := os.Create(localMockYaml)
+	prodMockYaml := filepath.Join(GetCwdFromExe(), "docker-compose.yml")
+	prod, prodErr := os.Create(prodMockYaml)
 	assert.Equal(t, nil, localErr, "Expected `os.Create()` to return no error")
 	assert.Equal(t, nil, prodErr, "Expected `os.Create()` to return no error")
 	assert.True(t, FileExists(localMockYaml), "Expected `FileExists()` to return true")
