@@ -6,7 +6,9 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -187,4 +189,34 @@ func AskForConfirmation(s string) bool {
 			return false
 		}
 	}
+}
+
+// DownloadFile downloads a file from the specified URL and saves it to the provided filepath.
+func DownloadFile(url string, filepath string) error {
+	// Create the file to stream the contents
+	out, err := os.Create(filepath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer out.Close()
+
+	// Fetch the file to begin the download
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download file: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check for HTTP errors
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download file: received status code %d", resp.StatusCode)
+	}
+
+	// Write the contents to the file created earlier
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
 }
