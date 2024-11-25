@@ -78,7 +78,7 @@ func WriteBloodHoundEnvironmentVariables() {
 // checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
 func checkJsonFileExistsAndCreate() {
 	if !FileExists(filepath.Join(GetCwdFromExe(), "bloodhound.config.json")) {
-		file, err := os.Create(filepath.Join(GetCwdFromExe(), "ƒ"))
+		file, err := os.Create(filepath.Join(GetCwdFromExe(), "bloodhound.config.json"))
 
 		if err != nil {
 			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
@@ -109,7 +109,7 @@ func ParseBloodHoundEnvironmentVariables() {
 	bhEnv.SetConfigType("json")
 	bhEnv.AddConfigPath(GetCwdFromExe())
 	bhEnv.AutomaticEnv()
-	// Check if expected env file exists
+	// Check if expected JSON file exists
 	checkJsonFileExistsAndCreate()
 	// Try reading the env file
 	if err := bhEnv.ReadInConfig(); err != nil {
