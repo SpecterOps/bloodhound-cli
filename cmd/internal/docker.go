@@ -8,20 +8,24 @@ import (
 	"github.com/docker/docker/client"
 	"log"
 	"path/filepath"
-	"strings"
 )
 
 // Vars for tracking the list of BloodHound images
 // Used for filtering the list of containers returned by the Docker client
 var (
 	prodImages = []string{
-		"docker.io/specterops/bloodhound", "docker.io/library/neo4j", "docker.io/library/postgres",
+		"bhce_bloodhound", "bhce_neo4j", "bhce_postgres",
 	}
 	devImages = []string{
-		"specterops/bloodhound", "neo4j:4.4", "postgres:16",
+		"bhce_bloodhound", "bhce_neo4j", "bhce_postgres",
 	}
 	// Default root command for Docker commands
 	dockerCmd = "docker"
+	// URLs for the BloodHound compose files
+	devYaml  = "docker-compose.dev.yml"
+	prodYaml = "docker-compose.yml"
+	devUrl   = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/docker-compose.dev.yml"
+	prodUrl  = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/examples/docker-compose/docker-compose.yml"
 )
 
 // Container is a custom type for storing container information similar to output from "docker containers ls".
@@ -53,7 +57,12 @@ func (c Containers) Swap(i, j int) {
 
 // EvaluateDockerComposeStatus determines if the host has the "docker compose" plugin or the "docker compose"
 // script installed and set the global `dockerCmd` variable.
-func EvaluateDockerComposeStatus() error {
+func EvaluateDockerComposeStatus(install ...bool) error {
+	isInstall := false
+	if len(install) > 0 {
+		isInstall = install[0]
+	}
+
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
 	dockerExists := CheckPath("docker")
@@ -70,21 +79,23 @@ func EvaluateDockerComposeStatus() error {
 	// Check for the ``compose`` plugin as our first choice
 	_, composeErr := RunBasicCmd("docker", []string{"compose", "version"})
 	if composeErr != nil {
-		fmt.Println("[+] The `compose` is not installed, so we'll try the deprecated `docker-compose` script")
+		fmt.Println("[+] The `compose` plugin is not installed, so we'll try the deprecated `docker-compose` script")
 		composeScriptExists := CheckPath("docker-compose")
 		if composeScriptExists {
 			fmt.Println("[+] The `docker-compose` script is installed, so we'll use that instead")
 			dockerCmd = "docker-compose"
 		} else {
-			fmt.Println("[+] The `docker-compose` script is also not installed or in the PATH")
+			fmt.Println("[+] The `docker-compose` script is also not installed or not in the PATH")
 			log.Fatalln("Docker Compose is not installed, so please install it and try again: https://docs.docker.com/compose/install/")
 		}
 	}
 
 	// Bail out if we're not in the same directory as the YAML files
 	// Otherwise, we'll get a confusing error message from the `compose` plugin
-	if !FileExists(filepath.Join(GetCwdFromExe(), "docker-compose.yml")) {
-		log.Fatalln("BloodHound CLI must be run in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
+	if !isInstall {
+		if !FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) || !FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
+			log.Fatalln("BloodHound CLI must be run in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
+		}
 	}
 
 	return nil
@@ -93,6 +104,23 @@ func EvaluateDockerComposeStatus() error {
 // RunDockerComposeInstall executes the "docker compose" commands for a first-time installation with
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeInstall(yaml string) {
+	// If the YAML files don't exist, download them from the BloodHound repo
+	if !FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) {
+		fmt.Printf("[+] Downloading the production YAML file from %s...\n", prodUrl)
+		downloadErr := DownloadFile(prodUrl, prodYaml)
+		if downloadErr != nil {
+			log.Fatalf("Error trying to download the production YAML file: %v\n", downloadErr)
+		}
+	}
+
+	if !FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
+		fmt.Printf("[+] Downloading the development YAML file from %s...\n", devUrl)
+		downloadErr := DownloadFile(devUrl, devYaml)
+		if downloadErr != nil {
+			log.Fatalf("Error trying to download the development YAML file: %v\n", downloadErr)
+		}
+	}
+
 	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if buildErr != nil {
 		log.Fatalf("Error trying to build with %s: %v\n", yaml, buildErr)
@@ -188,15 +216,8 @@ func FetchLogs(containerName string, lines string) []string {
 	}
 	if len(containers) > 0 {
 		for _, container := range containers {
-			imageName := container.Image
-			if colonIndex := strings.Index(imageName, ":"); colonIndex != -1 {
-				imageName = imageName[:colonIndex]
-			}
-			imageName = strings.TrimPrefix(imageName, "docker.io/specterops/")
-			imageName = strings.TrimPrefix(imageName, "docker.io/library/")
-
-			if strings.Contains(container.Image, containerName) {
-				logs = append(logs, fmt.Sprintf("\n*** Logs for `%s` ***\n\n", container.Image))
+			if container.Labels["name"] == containerName || containerName == "all" || container.Labels["name"] == "bhce_"+containerName {
+				logs = append(logs, fmt.Sprintf("\n*** Logs for `%s` ***\n\n", container.Labels["name"]))
 				reader, err := cli.ContainerLogs(context.Background(), container.ID, types.ContainerLogsOptions{
 					ShowStdout: true,
 					ShowStderr: true,
@@ -243,11 +264,7 @@ func GetRunning() Containers {
 	}
 	if len(containers) > 0 {
 		for _, container := range containers {
-			imageName := container.Image
-			if colonIndex := strings.Index(imageName, ":"); colonIndex != -1 {
-				imageName = imageName[:colonIndex]
-			}
-			if Contains(devImages, imageName) || Contains(prodImages, imageName) {
+			if Contains(devImages, container.Labels["name"]) || Contains(prodImages, container.Labels["name"]) {
 				running = append(running, Container{
 					container.ID, container.Image, container.Status, container.Ports, container.Labels["name"],
 				})
