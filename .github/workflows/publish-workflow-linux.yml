@@ -1,0 +1,35 @@
+name: Publish Binaries to Release (Linux)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux]
+        goarch: [amd64, arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Values
+        run: echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV && echo "BUILD_DATE=$(date -u '+%d %b %Y')" >> $GITHUB_ENV
+
+      - name: Build
+        uses: wangyoucao577/go-release-action@v1.39
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          project_path: "."
+          binary_name: "bloodhound-cli"
+          ldflags: -s -w -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.Version=${{ env.VERSION }}" -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.BuildDate=${{ env.BUILD_DATE }}"
+          release_tag: ${{ github.ref_name }}
+          overwrite: true
+          executable_compression: upx --brute

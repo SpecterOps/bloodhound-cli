@@ -1,0 +1,45 @@
+name: Build Rolling Release (macOS)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [darwin]
+        goarch: [amd64, arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Values
+        run: echo "VERSION=rolling" >> $GITHUB_ENV && echo "BUILD_DATE=$(date -u '+%d %b %Y')" >> $GITHUB_ENV
+
+      - name: Build
+        uses: wangyoucao577/go-release-action@v1.39
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          project_path: "."
+          binary_name: "bloodhound-cli"
+          ldflags: -s -w -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.Version=${{ env.VERSION }}" -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.BuildDate=${{ env.BUILD_DATE }}"
+          release_tag: rolling
+          overwrite: true
+
+      - name: Update Rolling Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Rolling Release (unstable)
+          tag_name: rolling
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          body: |
+            This is the rolling release of BloodHound CLI compiled from source (${{ github.sha }}).
+            The repository updates releases automatically to keep them up-to-date with the `${{ github.ref_name }}` ${{ github.ref_type }}.
+            Releases were last built on ${{ env.BUILD_DATE }}.
