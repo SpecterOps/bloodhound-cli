@@ -26,6 +26,7 @@ var (
 	prodYaml = "docker-compose.yml"
 	devUrl   = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/docker-compose.dev.yml"
 	prodUrl  = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/examples/docker-compose/docker-compose.yml"
+	loginUri = "/ui/login"
 )
 
 // Container is a custom type for storing container information similar to output from "docker containers ls".
@@ -130,8 +131,9 @@ func RunDockerComposeInstall(yaml string) {
 		log.Fatalf("Error trying to bring up environment with %s: %v\n", yaml, upErr)
 	}
 	fmt.Println("[+] BloodHound is ready to go!")
-	fmt.Printf("[+] You can login as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.bh_default_admin_password"))
+	fmt.Printf("[+] You can log in as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.bh_default_admin_password"))
 	fmt.Println("[+] You can get your admin password by running: bloodhound-cli config get default_password")
+	fmt.Printf("[+] You can access the BloodHound UI at: %s%s\n", bhEnv.GetString("root_url"), loginUri)
 }
 
 // RunDockerComposeUpgrade executes the "docker compose" commands for re-building or upgrading an
