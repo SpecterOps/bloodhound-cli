@@ -3,7 +3,7 @@ module github.com/SpecterOps/BloodHound_CLI
 go 1.17
 
 require (
-	github.com/docker/docker v20.10.15+incompatible
+	github.com/docker/docker v20.10.27+incompatible
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.8.0
