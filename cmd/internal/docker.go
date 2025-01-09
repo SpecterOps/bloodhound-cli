@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -24,8 +25,8 @@ var (
 	// URLs for the BloodHound compose files
 	devYaml  = "docker-compose.dev.yml"
 	prodYaml = "docker-compose.yml"
-	devUrl   = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/docker-compose.dev.yml"
-	prodUrl  = "https://raw.githubusercontent.com/SpecterOps/BloodHound/refs/heads/main/examples/docker-compose/docker-compose.yml"
+	devUrl   = "https://raw.githubusercontent.com/SpecterOps/BloodHound_CLI/refs/heads/main/docker-compose.dev.yml"
+	prodUrl  = "https://raw.githubusercontent.com/SpecterOps/BloodHound_CLI/refs/heads/main/docker-compose.yml"
 	loginUri = "/ui/login"
 )
 
@@ -106,20 +107,28 @@ func EvaluateDockerComposeStatus(install ...bool) error {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeInstall(yaml string) {
 	// If the YAML files don't exist, download them from the BloodHound repo
-	if !FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) {
-		fmt.Printf("[+] Downloading the production YAML file from %s...\n", prodUrl)
-		downloadErr := DownloadFile(prodUrl, prodYaml)
-		if downloadErr != nil {
-			log.Fatalf("Error trying to download the production YAML file: %v\n", downloadErr)
+	if FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) {
+		c := AskForConfirmation("[*] A production YAML file already exists in the current directory. Do you want to overwrite it and continue with the install?")
+		if !c {
+			os.Exit(0)
 		}
 	}
+	fmt.Printf("[+] Downloading the production YAML file from %s...\n", prodUrl)
+	prodDownloadErr := DownloadFile(prodUrl, prodYaml)
+	if prodDownloadErr != nil {
+		log.Fatalf("Error trying to download the production YAML file: %v\n", prodDownloadErr)
+	}
 
-	if !FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
-		fmt.Printf("[+] Downloading the development YAML file from %s...\n", devUrl)
-		downloadErr := DownloadFile(devUrl, devYaml)
-		if downloadErr != nil {
-			log.Fatalf("Error trying to download the development YAML file: %v\n", downloadErr)
+	if FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
+		c := AskForConfirmation("[*] A development YAML file already exists in the current directory. Do you want to overwrite it and continue with the install?")
+		if !c {
+			os.Exit(0)
 		}
+	}
+	fmt.Printf("[+] Downloading the development YAML file from %s...\n", devUrl)
+	devDownloadErr := DownloadFile(devUrl, devYaml)
+	if devDownloadErr != nil {
+		log.Fatalf("Error trying to download the development YAML file: %v\n", devDownloadErr)
 	}
 
 	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
