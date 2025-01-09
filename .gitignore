@@ -20,6 +20,4 @@
 
 .env
 bloodhound-cli
-docker-compose.yml
-docker-compose.dev.yml
 bloodhound.config.json
