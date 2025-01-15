@@ -52,7 +52,7 @@ func setBloodHoundConfigDefaultValues() {
 	// Base config
 	bhEnv.SetDefault("bind_addr", "0.0.0.0:8080")
 	bhEnv.SetDefault("metrics_port", ":2112")
-	bhEnv.SetDefault("root_url", "http://127.0.0.1:8080/")
+	bhEnv.SetDefault("root_url", "http://127.0.0.1:8080")
 	bhEnv.SetDefault("work_dir", "/opt/bloodhound/work")
 	bhEnv.SetDefault("log_level", "INFO")
 	bhEnv.SetDefault("log_path", "bloodhound.log")
