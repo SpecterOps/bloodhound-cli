@@ -1,9 +1,12 @@
-# BloodHound_CLI
+# BloodHound CLI
 
-[![Go](https://img.shields.io/badge/Go-1.18-9cf)](.)
+![Go](https://img.shields.io/github/go-mod/go-version/SpecterOps/bloodhound-cli?color=50B071)
 
-![GitHub Release (Latest by Date)](https://img.shields.io/github/v/release/SpecterOps/BloodHound_CLI?label=Latest%20Release)
-![GitHub Release Date](https://img.shields.io/github/release-date/SpecterOps/BloodHound_CLI?label=Release%20Date)
+![GitHub Release (Latest by Date)](https://img.shields.io/github/v/release/SpecterOps/bloodhound-cli?label=Latest%20Release&color=E61616
+)
+![GitHub Release Date](https://img.shields.io/github/release-date/SpecterOps/bloodhound-cli?label=Release%20Date&color=E1E2EF)
+
+![BHCLI.png](BHCLI.png)
 
 Golang code for the `bloodhound-cli` binary in [BloodHound](https://github.com/SpecterOps/BloodHound). This binary provides control for various aspects of BloodHound's configuration.
 
