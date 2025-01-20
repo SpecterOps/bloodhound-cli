@@ -47,7 +47,7 @@ func setBloodHoundConfigDefaultValues() {
 
 	// Initial user setup
 	bhEnv.SetDefault("default_admin.principal_name", "admin")
-	bhEnv.SetDefault("default_admin.bh_default_admin_password", GenerateRandomPassword(32, true))
+	bhEnv.SetDefault("default_admin.password", GenerateRandomPassword(32, true))
 
 	// Base config
 	bhEnv.SetDefault("bind_addr", "0.0.0.0:8080")
@@ -63,7 +63,7 @@ func setBloodHoundConfigDefaultValues() {
 	bhEnv.SetDefault("tls.key_file", "")
 
 	// Set some helpful aliases for common settings
-	bhEnv.RegisterAlias("default_password", "default_admin.bh_default_admin_password")
+	bhEnv.RegisterAlias("default_password", "default_admin.password")
 }
 
 // WriteBloodHoundEnvironmentVariables writes the environment variables to the JSON config file.
