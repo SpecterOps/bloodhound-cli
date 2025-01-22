@@ -18,6 +18,5 @@
 
 .idea
 
-.env
 bloodhound-cli
 bloodhound.config.json
