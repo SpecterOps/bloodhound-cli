@@ -140,7 +140,7 @@ func RunDockerComposeInstall(yaml string) {
 		log.Fatalf("Error trying to bring up environment with %s: %v\n", yaml, upErr)
 	}
 	fmt.Println("[+] BloodHound is ready to go!")
-	fmt.Printf("[+] You can log in as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.bh_default_admin_password"))
+	fmt.Printf("[+] You can log in as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.password"))
 	fmt.Println("[+] You can get your admin password by running: bloodhound-cli config get default_password")
 	fmt.Printf("[+] You can access the BloodHound UI at: %s%s\n", bhEnv.GetString("root_url"), loginUri)
 }
