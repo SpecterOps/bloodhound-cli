@@ -6,9 +6,6 @@ import (
 	"os"
 )
 
-// Vars for global flags
-var dev bool
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "bloodhound-cli",

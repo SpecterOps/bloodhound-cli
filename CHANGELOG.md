@@ -4,13 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.2] - 2024-1-22
+## [0.1.3] - 2025-1-30
+
+### Added
+
+* Added a `--volumes` flag to the `containers down` command that deletes the data volumes when the containers come down
+
+## [0.1.2] - 2025-1-22
 
 ### Fixed
 
 * Fixed `install` output not showing the initial password in the output
 
-## [0.1.1] - 2024-1-21
+## [0.1.1] - 2025-1-21
 
 ### Fixed
 

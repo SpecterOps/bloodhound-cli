@@ -206,9 +206,13 @@ func RunDockerComposeUp(yaml string) {
 
 // RunDockerComposeDown executes the "docker compose" commands to bring down the environment with
 // the specified YAML file ("yaml" parameter).
-func RunDockerComposeDown(yaml string) {
+func RunDockerComposeDown(yaml string, volumes bool) {
 	fmt.Printf("[+] Running `%s` to bring down the containers with %s...\n", dockerCmd, yaml)
-	downErr := RunCmd(dockerCmd, []string{"-f", yaml, "down"})
+	args := []string{"-f", yaml, "down"}
+	if volumes {
+		args = append(args, "--volumes")
+	}
+	downErr := RunCmd(dockerCmd, args)
 	if downErr != nil {
 		log.Fatalf("Error trying to bring down the containers with %s: %v\n", yaml, downErr)
 	}

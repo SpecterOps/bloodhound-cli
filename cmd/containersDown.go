@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var volumes bool
+
 // containersDownCmd represents the down command
 var containersDownCmd = &cobra.Command{
 	Use:   "down",
@@ -17,10 +19,12 @@ performs the equivalent of running the "docker compose down" command.`,
 
 func init() {
 	containersCmd.AddCommand(containersDownCmd)
+
+	containersDownCmd.PersistentFlags().BoolVar(&volumes, "volumes", false, "Delete data volumes when containers come down")
 }
 
 func containersDown(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing down the BloodHound environment")
-	docker.RunDockerComposeDown("docker-compose.yml")
+	docker.RunDockerComposeDown("docker-compose.yml", volumes)
 }
