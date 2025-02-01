@@ -232,6 +232,16 @@ func RunDockerComposeDown(yaml string, volumes bool) {
 	}
 }
 
+// RunDockerComposePull executes the "docker compose" commands to pull the latest container images for
+// the specified YAML file ("yaml" parameter).
+func RunDockerComposePull(yaml string) {
+	fmt.Printf("[+] Running `%s` to pull container imahes with %s...\n", dockerCmd, yaml)
+	startErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
+	if startErr != nil {
+		log.Fatalf("Error trying to pull the container images with %s: %v\n", yaml, startErr)
+	}
+}
+
 // FetchLogs fetches logs from the container with the specified "name" label ("containerName" parameter).
 func FetchLogs(containerName string, lines string) []string {
 	var logs []string
