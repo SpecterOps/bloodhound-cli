@@ -40,7 +40,7 @@ func TestBloodHoundEnvironmentVariables(t *testing.T) {
 	assert.Equal(t, len(format), 2, "`GetConfig()` with two valid variables should return a two values")
 
 	// Test ``GetConfigAll()``
-	assert.Equal(t, 11, CountConfigProperties(), "`GetConfigAll()` should return all values")
+	assert.Equal(t, 12, CountConfigProperties(), "`GetConfigAll()` should return all values")
 
 	// Test ``SetConfig()``
 	SetConfig("log_path", "bhce.log")
