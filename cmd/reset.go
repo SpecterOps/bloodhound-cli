@@ -19,6 +19,8 @@ The command performs the following steps:
 * Generates a new password
 * Brings the containers back up to recreate the admin record
 
+**NOTE** : This command requires BloodHound >= v7.1.0.
+
 **WARNING** : This action wipes all user data for the default admin user. This action cannot be undone.
 `,
 	Run: resetAdminPwd,
