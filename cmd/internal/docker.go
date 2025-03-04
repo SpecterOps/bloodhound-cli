@@ -313,3 +313,20 @@ func GetRunning() Containers {
 
 	return running
 }
+
+// ResetAdminPassword executes the "docker compose" commands to brings containers down and back up to reset the default
+// admin account for the specified YAML file ("yaml" parameter).
+func ResetAdminPassword(yaml string) {
+	RunDockerComposeDown(yaml, false)
+	bhEnv.Set("default_admin.password", GenerateRandomPassword(32, true))
+	WriteBloodHoundEnvironmentVariables()
+	envErr := os.Setenv("bhe_recreate_default_admin", "true")
+	if envErr != nil {
+		log.Fatalf("Error setting the necessary `bhe_recreate_default_admin` environment variable: %v\n", envErr)
+	}
+	RunDockerComposeUp(yaml)
+	fmt.Println("[+] BloodHound is ready to go!")
+	fmt.Printf("[+] You can log in as `%s` with this password: %s\n", bhEnv.GetString("default_admin.principal_name"), bhEnv.GetString("default_admin.password"))
+	fmt.Println("[+] You can get your admin password by running: bloodhound-cli config get default_password")
+	fmt.Printf("[+] You can access the BloodHound UI at: %s%s\n", bhEnv.GetString("root_url"), loginUri)
+}

@@ -57,6 +57,7 @@ func setBloodHoundConfigDefaultValues() {
 	bhEnv.SetDefault("log_level", "INFO")
 	bhEnv.SetDefault("log_path", "bloodhound.log")
 	bhEnv.SetDefault("collectors_base_path", "/etc/bloodhound/collectors")
+	bhEnv.SetDefault("RecreateDefaultAdmin", "false")
 
 	// TLS config
 	bhEnv.SetDefault("tls.cert_file", "")
