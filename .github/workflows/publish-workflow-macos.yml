@@ -32,4 +32,4 @@ jobs:
           ldflags: -s -w -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.Version=${{ env.VERSION }}" -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.BuildDate=${{ env.BUILD_DATE }}"
           release_tag: ${{ github.ref_name }}
           overwrite: true
-          asset_name: ${BINARY_NAME}-${GOOS}-${GOARCH}
+          asset_name: bloodhound-cli-${{ matrix.goos }}-${{ matrix.goarch }}

@@ -33,4 +33,4 @@ jobs:
           release_tag: ${{ github.ref_name }}
           overwrite: true
           executable_compression: upx --brute
-          asset_name: ${BINARY_NAME}-${GOOS}-${GOARCH}
+          asset_name: bloodhound-cli-${{ matrix.goos }}-${{ matrix.goarch }}
