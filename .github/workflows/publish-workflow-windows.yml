@@ -22,7 +22,7 @@ jobs:
         run: echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV && echo "BUILD_DATE=$(date -u '+%d %b %Y')" >> $GITHUB_ENV
 
       - name: Build
-        uses: wangyoucao577/go-release-action@v1.39
+        uses: wangyoucao577/go-release-action@v1.53
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
@@ -33,3 +33,4 @@ jobs:
           release_tag: ${{ github.ref_name }}
           overwrite: true
           executable_compression: upx --brute
+          asset_name: ${BINARY_NAME}-${GOOS}-${GOARCH}

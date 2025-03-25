@@ -22,7 +22,7 @@ jobs:
         run: echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV && echo "BUILD_DATE=$(date -u '+%d %b %Y')" >> $GITHUB_ENV
 
       - name: Build
-        uses: wangyoucao577/go-release-action@v1.39
+        uses: wangyoucao577/go-release-action@v1.53
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
@@ -32,3 +32,4 @@ jobs:
           ldflags: -s -w -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.Version=${{ env.VERSION }}" -X "github.com/SpecterOps/BloodHound_CLI/cmd/config.BuildDate=${{ env.BUILD_DATE }}"
           release_tag: ${{ github.ref_name }}
           overwrite: true
+          asset_name: ${BINARY_NAME}-${GOOS}-${GOARCH}
