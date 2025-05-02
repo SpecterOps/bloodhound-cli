@@ -12,7 +12,9 @@ Golang code for the `bloodhound-cli` binary in [BloodHound](https://github.com/S
 
 ## Usage
 
-Execute `./bloodhound-cli help` for usage information (see below). More information about BloodHound and how to manage it with `bloodhound-cli` can be found on the [BloodHound Wiki](https://github.com/SpecterOps/BloodHound/wiki/).
+Execute `./bloodhound-cli help` for usage information (see below). 
+
+More information about BloodHound and how to manage it with `bloodhound-cli` can be found on the [[BloodHound Community Edition Quickstart Guide](https://github.com/SpecterOps/BloodHound/wiki/](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart)), which is part of the [BloodHound documentation](https://bloodhound.specterops.io/home).
 
 ## Compilation
 
