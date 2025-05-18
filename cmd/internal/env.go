@@ -78,9 +78,12 @@ func WriteBloodHoundEnvironmentVariables() {
 
 // checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
 func checkJsonFileExistsAndCreate() {
-	if !FileExists(filepath.Join(GetCwdFromExe(), "bloodhound.config.json")) {
-		file, err := os.Create(filepath.Join(GetCwdFromExe(), "bloodhound.config.json"))
-
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Failed to get current working directory: %v", err)
+	}
+	if !FileExists(filepath.Join(cwd, "bloodhound.config.json")) {
+		file, err := os.Create(filepath.Join(cwd, "bloodhound.config.json"))
 		if err != nil {
 			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
 		}
@@ -105,22 +108,26 @@ func checkJsonFileExistsAndCreate() {
 // If a JSON config file is not found, create a new one with default values.
 // Then write the final file with `WriteBloodHoundEnvironmentVariables()`.
 func ParseBloodHoundEnvironmentVariables() {
-	setBloodHoundConfigDefaultValues()
-	bhEnv.SetConfigName("bloodhound.config.json")
-	bhEnv.SetConfigType("json")
-	bhEnv.AddConfigPath(GetCwdFromExe())
-	bhEnv.AutomaticEnv()
-	// Check if expected JSON file exists
-	checkJsonFileExistsAndCreate()
-	// Try reading the env file
-	if err := bhEnv.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Fatalf("Error while reading in the JSON config file: %s", err)
-		} else {
-			log.Fatalf("Error while parsing the JSON config file: %s", err)
-		}
-	}
-	WriteBloodHoundEnvironmentVariables()
+    setBloodHoundConfigDefaultValues()
+    bhEnv.SetConfigName("bloodhound.config.json")
+    bhEnv.SetConfigType("json")
+    cwd, err := os.Getwd()
+    if err != nil {
+        log.Fatalf("Cannot get current working directory: %s", err)
+    }
+    bhEnv.AddConfigPath(cwd)
+    bhEnv.AutomaticEnv()
+    // Check if expected JSON file exists
+    checkJsonFileExistsAndCreate()
+    // Try reading the env file
+    if err := bhEnv.ReadInConfig(); err != nil {
+        if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+            log.Fatalf("Error while reading in the JSON config file: %s", err)
+        } else {
+            log.Fatalf("Error while parsing the JSON config file: %s", err)
+        }
+    }
+    WriteBloodHoundEnvironmentVariables()
 }
 
 // GetConfigAll retrieves all values from the JSON config configuration file.
