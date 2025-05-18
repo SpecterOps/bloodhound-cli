@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
 )
@@ -34,5 +36,16 @@ func uninstallBloodHound(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Println("[+] Starting BloodHound environment removal")
-	docker.RunDockerComposeUninstall("docker-compose.yml")
+
+	// Get current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("[-] Failed to get current directory:", err)
+		return
+	}
+
+	// Build full path to docker-compose.yml
+	composePath := filepath.Join(cwd, "docker-compose.yml")
+
+	docker.RunDockerComposeUninstall(composePath)
 }
