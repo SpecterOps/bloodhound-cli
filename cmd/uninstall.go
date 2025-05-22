@@ -29,7 +29,7 @@ func init() {
 }
 
 func uninstallBloodHound(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus(true)
+	err := docker.EvaluateDockerComposeStatus()
 	if err != nil {
 		return
 	}
