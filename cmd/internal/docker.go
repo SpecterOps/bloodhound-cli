@@ -92,44 +92,66 @@ func EvaluateDockerComposeStatus(install ...bool) error {
 		}
 	}
 
+	fmt.Println("[+] Docker and the Compose plugin checks have passed")
+
 	// Bail out if we're not in the same directory as the YAML files
 	// Otherwise, we'll get a confusing error message from the `compose` plugin
 	if !isInstall {
 		if !FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) || !FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
-			log.Fatalln("BloodHound CLI must be run in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
+			log.Fatalln("BloodHound CLI must be in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
 		}
 	}
 
 	return nil
 }
 
+// DownloadDockerComposeFiles downloads production and development Docker Compose YAML files if confirmed by the user.
+// Prompts the user before overwriting existing files in the current working directory.
+// Requires overwriting confirmation for both prod and dev YAML files if they already exist.
+func DownloadDockerComposeFiles() {
+	workingDir := GetCwdFromExe()
+	downloadProd := true
+	downloadDev := true
+	if FileExists(filepath.Join(workingDir, prodYaml)) {
+		c := AskForConfirmation("[*] A production YAML file already exists in the current directory. Do you want to overwrite it?")
+		if !c {
+			downloadProd = false
+		}
+	}
+	if downloadProd {
+		fmt.Printf("[+] Downloading the production YAML file from %s...\n", prodUrl)
+		prodDownloadErr := DownloadFile(prodUrl, filepath.Join(workingDir, prodYaml))
+		if prodDownloadErr != nil {
+			log.Fatalf("Error trying to download the production YAML file: %v\n", prodDownloadErr)
+		}
+	}
+
+	if FileExists(filepath.Join(workingDir, devYaml)) {
+		c := AskForConfirmation("[*] A development YAML file already exists in the current directory. Do you want to overwrite it?")
+		if !c {
+			downloadDev = false
+		}
+	}
+	if downloadDev {
+		fmt.Printf("[+] Downloading the development YAML file from %s...\n", devUrl)
+		devDownloadErr := DownloadFile(devUrl, filepath.Join(workingDir, devYaml))
+		if devDownloadErr != nil {
+			log.Fatalf("Error trying to download the development YAML file: %v\n", devDownloadErr)
+		}
+	}
+}
+
+// EvaluateEnvironment checks for the presence of Docker YAML files and initiates their download if necessary.
+func EvaluateEnvironment() {
+	fmt.Println("[+] Checking for the Docker YAML files...")
+	DownloadDockerComposeFiles()
+}
+
 // RunDockerComposeInstall executes the "docker compose" commands for a first-time installation with
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeInstall(yaml string) {
 	// If the YAML files don't exist, download them from the BloodHound repo
-	if FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) {
-		c := AskForConfirmation("[*] A production YAML file already exists in the current directory. Do you want to overwrite it and continue with the install?")
-		if !c {
-			os.Exit(0)
-		}
-	}
-	fmt.Printf("[+] Downloading the production YAML file from %s...\n", prodUrl)
-	prodDownloadErr := DownloadFile(prodUrl, prodYaml)
-	if prodDownloadErr != nil {
-		log.Fatalf("Error trying to download the production YAML file: %v\n", prodDownloadErr)
-	}
-
-	if FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
-		c := AskForConfirmation("[*] A development YAML file already exists in the current directory. Do you want to overwrite it and continue with the install?")
-		if !c {
-			os.Exit(0)
-		}
-	}
-	fmt.Printf("[+] Downloading the development YAML file from %s...\n", devUrl)
-	devDownloadErr := DownloadFile(devUrl, devYaml)
-	if devDownloadErr != nil {
-		log.Fatalf("Error trying to download the development YAML file: %v\n", devDownloadErr)
-	}
+	DownloadDockerComposeFiles()
 
 	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if buildErr != nil {
