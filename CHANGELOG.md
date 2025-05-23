@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2025-4-23
+
+### Added
+
+* Added a `check` command to check for necessary Docker and Docker Compose commands and the YAML files
+
+### Changed
+
+* Updated golang.org/x/net
+
+### Fixed
+
+* Fixed YAML files being downloaded to your current working directory instead of the CLI binary's directory
+
 ## [0.1.5] - 2025-3-25
 
 ### Changed
