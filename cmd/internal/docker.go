@@ -96,7 +96,7 @@ func EvaluateDockerComposeStatus() error {
 // Prompts the user before overwriting existing files in the current working directory.
 // Requires overwriting confirmation for both prod and dev YAML files if they already exist.
 func DownloadDockerComposeFiles() {
-	workingDir := GetCwdFromExe()
+	workingDir := GetBloodHoundDir()
 	downloadProd := true
 	downloadDev := true
 	if FileExists(filepath.Join(workingDir, prodYaml)) {
