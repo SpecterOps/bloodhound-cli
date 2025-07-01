@@ -162,17 +162,33 @@ func RunDockerComposeUninstall(yaml string) {
 	if !c {
 		os.Exit(0)
 	}
+
+	fmt.Println("[+] Uninstalling the BloodHound containers...")
+	CheckYamlExists(yaml)
 	uninstallErr := RunCmd(dockerCmd, []string{"-f", yaml, "down", "--rmi", "all", "-v", "--remove-orphans"})
 	if uninstallErr != nil {
 		log.Fatalf("Error trying to uninstall with %s: %v\n", yaml, uninstallErr)
 	}
+
+	homeDir := GetBloodHoundDir()
+	delConf := AskForConfirmation("[!] Do you want to also delete the home directory, " + homeDir + ", and its contents?")
+	if !delConf {
+		os.Exit(0)
+	}
+
+	delErr := DeleteHomeDir(homeDir)
+	if delErr != nil {
+		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
+	}
 	fmt.Println("[+] Uninstall was successful. You can re-install with `./bloodhound-cli install`.")
+	fmt.Println("[+] The home directory and config will be recreated if you continue using BloodHound CLI.")
 }
 
 // RunDockerComposeUpgrade executes the "docker compose" commands for re-building or upgrading an
 // installation with the specified YAML file ("yaml" parameter).
 func RunDockerComposeUpgrade(yaml string) {
 	fmt.Printf("[+] Running `%s` commands to build containers with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	downErr := RunCmd(dockerCmd, []string{"-f", yaml, "down"})
 	if downErr != nil {
 		log.Fatalf("Error trying to bring down any running containers with %s: %v\n", yaml, downErr)
