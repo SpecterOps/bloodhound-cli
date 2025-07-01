@@ -59,12 +59,7 @@ func (c Containers) Swap(i, j int) {
 
 // EvaluateDockerComposeStatus determines if the host has the "docker compose" plugin or the "docker compose"
 // script installed and set the global `dockerCmd` variable.
-func EvaluateDockerComposeStatus(install ...bool) error {
-	isInstall := false
-	if len(install) > 0 {
-		isInstall = install[0]
-	}
-
+func EvaluateDockerComposeStatus() error {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
 	dockerExists := CheckPath("docker")
@@ -93,14 +88,6 @@ func EvaluateDockerComposeStatus(install ...bool) error {
 	}
 
 	fmt.Println("[+] Docker and the Compose plugin checks have passed")
-
-	// Bail out if we're not in the same directory as the YAML files
-	// Otherwise, we'll get a confusing error message from the `compose` plugin
-	if !isInstall {
-		if !FileExists(filepath.Join(GetCwdFromExe(), prodYaml)) || !FileExists(filepath.Join(GetCwdFromExe(), devYaml)) {
-			log.Fatalln("BloodHound CLI must be in the same directory as the `docker-compose.yml` and `docker-compose.dev.yml` files")
-		}
-	}
 
 	return nil
 }
