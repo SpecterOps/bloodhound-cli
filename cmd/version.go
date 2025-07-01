@@ -19,5 +19,5 @@ func init() {
 }
 
 func displayVersion(cmd *cobra.Command, args []string) {
-	fmt.Printf("BloodHound-CLI ( %s, %s )\n", config.Version, config.BuildDate)
+	fmt.Printf("BloodHound-CLI (%s, %s)\n", config.Version, config.BuildDate)
 }

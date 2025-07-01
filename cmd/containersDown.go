@@ -4,6 +4,7 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
+	"path/filepath"
 )
 
 var volumes bool
@@ -26,5 +27,5 @@ func init() {
 func containersDown(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing down the BloodHound environment")
-	docker.RunDockerComposeDown("docker-compose.yml", volumes)
+	docker.RunDockerComposeDown(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"), volumes)
 }
