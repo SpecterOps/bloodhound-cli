@@ -65,6 +65,8 @@ func setBloodHoundConfigDefaultValues() {
 
 	// Set some helpful aliases for common settings
 	bhEnv.RegisterAlias("default_password", "default_admin.password")
+
+	bhEnv.SetDefault("home_directory", GetDefaultHomeDir())
 }
 
 // WriteBloodHoundEnvironmentVariables writes the environment variables to the JSON config file.
