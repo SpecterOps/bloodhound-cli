@@ -126,9 +126,9 @@ func ParseBloodHoundEnvironmentVariables() {
 	setBloodHoundConfigDefaultValues()
 	bhEnv.SetConfigName("bloodhound.config.json")
 	bhEnv.SetConfigType("json")
-	bhEnv.AddConfigPath(GetCwdFromExe())
+	bhEnv.AddConfigPath(GetBloodHoundDir())
 	bhEnv.AutomaticEnv()
-	// Check if expected JSON file exists
+	// Check if the expected JSON file exists
 	checkJsonFileExistsAndCreate()
 	// Try reading the env file
 	if err := bhEnv.ReadInConfig(); err != nil {
