@@ -90,7 +90,7 @@ func MakeHomeDir() error {
 	homeDir := GetBloodHoundDir()
 	if !DirExists(homeDir) {
 		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it\n", homeDir)
-		mkErr := os.MkdirAll(homeDir, 0700)
+		mkErr := os.MkdirAll(homeDir, 0600)
 		if mkErr != nil {
 			return mkErr
 		}
@@ -100,7 +100,7 @@ func MakeHomeDir() error {
 	return nil
 }
 
-// CheckHomeDir checks if the home directory's permissions are at least 0700. This ensures the current user has full
+// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has full
 // access and no other users have access. This is intended as a secure baseline. A more permissive permissions set won't
 // trigger any errors.
 func CheckHomeDir(path string) (bool, error) {
@@ -108,7 +108,7 @@ func CheckHomeDir(path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	baselinePerms := os.FileMode(0700)
+	baselinePerms := os.FileMode(0600)
 	mode := info.Mode().Perm()
 	return mode&baselinePerms == baselinePerms, nil
 }

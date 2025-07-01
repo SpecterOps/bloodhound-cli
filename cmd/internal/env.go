@@ -113,7 +113,7 @@ func checkJsonFileExistsAndCreate() {
 		}
 
 		if !permCheck {
-			log.Fatalf("The permissions set on the home directory, %s, should be at least 0700 (owner has full access and otehrs have no access)", GetBloodHoundDir())
+			log.Fatalf("The permissions set on the home directory, %s, must be at least allow read and write for the current user (e.g., 0600).", GetBloodHoundDir())
 		}
 	}
 }
