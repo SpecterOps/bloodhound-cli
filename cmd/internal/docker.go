@@ -140,6 +140,7 @@ func RunDockerComposeInstall(yaml string) {
 	// If the YAML files don't exist, download them from the BloodHound repo
 	DownloadDockerComposeFiles()
 
+	CheckYamlExists(yaml)
 	buildErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if buildErr != nil {
 		log.Fatalf("Error trying to build with %s: %v\n", yaml, buildErr)
@@ -191,6 +192,7 @@ func RunDockerComposeUpgrade(yaml string) {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeStart(yaml string) {
 	fmt.Printf("[+] Running `%s` to restart containers with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	startErr := RunCmd(dockerCmd, []string{"-f", yaml, "start"})
 	if startErr != nil {
 		log.Fatalf("Error trying to restart the containers with %s: %v\n", yaml, startErr)
@@ -201,6 +203,7 @@ func RunDockerComposeStart(yaml string) {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeStop(yaml string) {
 	fmt.Printf("[+] Running `%s` to stop services with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	stopErr := RunCmd(dockerCmd, []string{"-f", yaml, "stop"})
 	if stopErr != nil {
 		log.Fatalf("Error trying to stop services with %s: %v\n", yaml, stopErr)
@@ -211,6 +214,7 @@ func RunDockerComposeStop(yaml string) {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeRestart(yaml string) {
 	fmt.Printf("[+] Running `%s` to restart containers with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	startErr := RunCmd(dockerCmd, []string{"-f", yaml, "restart"})
 	if startErr != nil {
 		log.Fatalf("Error trying to restart the containers with %s: %v\n", yaml, startErr)
@@ -221,6 +225,7 @@ func RunDockerComposeRestart(yaml string) {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposeUp(yaml string) {
 	fmt.Printf("[+] Running `%s` to bring up the containers with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	upErr := RunCmd(dockerCmd, []string{"-f", yaml, "up", "-d"})
 	if upErr != nil {
 		log.Fatalf("Error trying to bring up the containers with %s: %v\n", yaml, upErr)
@@ -235,6 +240,7 @@ func RunDockerComposeDown(yaml string, volumes bool) {
 	if volumes {
 		args = append(args, "--volumes")
 	}
+	CheckYamlExists(yaml)
 	downErr := RunCmd(dockerCmd, args)
 	if downErr != nil {
 		log.Fatalf("Error trying to bring down the containers with %s: %v\n", yaml, downErr)
@@ -245,6 +251,7 @@ func RunDockerComposeDown(yaml string, volumes bool) {
 // the specified YAML file ("yaml" parameter).
 func RunDockerComposePull(yaml string) {
 	fmt.Printf("[+] Running `%s` to pull container imahes with %s...\n", dockerCmd, yaml)
+	CheckYamlExists(yaml)
 	startErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if startErr != nil {
 		log.Fatalf("Error trying to pull the container images with %s: %v\n", yaml, startErr)
