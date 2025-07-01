@@ -106,6 +106,15 @@ func checkJsonFileExistsAndCreate() {
 		if err := encoder.Encode(emptyJSON); err != nil {
 			log.Fatalf("Failed to write JSON to file: %v", err)
 		}
+	} else {
+		permCheck, permErr := CheckHomeDir(GetBloodHoundDir())
+		if permErr != nil {
+			log.Fatalf("Error checking the permissions on the home directory: %s", permErr)
+		}
+
+		if !permCheck {
+			log.Fatalf("The permissions set on the home directory, %s, should be at least 0700 (owner has full access and otehrs have no access)", GetBloodHoundDir())
+		}
 	}
 }
 
