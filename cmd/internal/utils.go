@@ -69,6 +69,76 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
+// GetDefaultHomeDir returns the path for the default BloodHound home directory for initial config creation.
+// The initial path will always be a hidden `.BloodHound` directory inside the current user's home directory.
+func GetDefaultHomeDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Failed to get user's home directory path to set default home directory: %v", err)
+	}
+	return filepath.Join(homeDir, ".BloodHound")
+}
+
+// GetBloodHoundDir returns the full path configured as the home directory.
+func GetBloodHoundDir() string {
+	homeDir := bhEnv.GetString("home_directory")
+	return filepath.Join(homeDir)
+}
+
+// MakeHomeDir checks if the configured home directory exists and creates it if it does not.
+func MakeHomeDir() error {
+	homeDir := GetBloodHoundDir()
+	if !DirExists(homeDir) {
+		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it\n", homeDir)
+		mkErr := os.MkdirAll(homeDir, 0700)
+		if mkErr != nil {
+			return mkErr
+		}
+		log.Println("Successfully created the BloodHound home directory")
+	}
+
+	return nil
+}
+
+// CheckHomeDir checks if the home directory's permissions are at least 0700. This ensures the current user has full
+// access and no other users have access. This is intended as a secure baseline. A more permissive permissions set won't
+// trigger any errors.
+func CheckHomeDir(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+	baselinePerms := os.FileMode(0700)
+	mode := info.Mode().Perm()
+	return mode&baselinePerms == baselinePerms, nil
+}
+
+// DeleteHomeDir deletes the configured home directory and all contents. This is intended as the final step of the
+// `uninstall` command.
+func DeleteHomeDir(path string) error {
+	homeDir := bhEnv.GetString("home_directory")
+	if DirExists(homeDir) {
+		delErr := os.RemoveAll(homeDir)
+		if delErr != nil {
+			return delErr
+		}
+		log.Println("Successfully delete the BloodHound home directory")
+	}
+
+	return nil
+}
+
+// CheckYamlExists determines if the specified file exists and logs a fatal warning if it does not. It is a wrapper for
+// the `FileExists` function and is intended to check YAML files just before executing Docker commands.
+func CheckYamlExists(path string) {
+	if !FileExists(path) {
+		log.Fatalf(
+			"The YAML file %s does not exist! To continue, move your YAML file into the home directory or run "+
+				"`./bloodhound-cli check` to download the necessary YAML file.",
+			path)
+	}
+}
+
 // CheckPath checks the $PATH environment variable for a given "cmd" and return a "bool"
 // indicating if it exists.
 func CheckPath(cmd string) bool {
