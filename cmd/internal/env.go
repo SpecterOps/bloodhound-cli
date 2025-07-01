@@ -79,9 +79,16 @@ func WriteBloodHoundEnvironmentVariables() {
 }
 
 // checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
+// It also checks if the configured home directory exists, creates it if it does not, and then checks if the directory
+// has the correct minimum permissions.
 func checkJsonFileExistsAndCreate() {
-	if !FileExists(filepath.Join(GetCwdFromExe(), "bloodhound.config.json")) {
-		file, err := os.Create(filepath.Join(GetCwdFromExe(), "bloodhound.config.json"))
+	if !FileExists(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")) {
+		homeErr := MakeHomeDir()
+		if homeErr != nil {
+			log.Fatalf("Error creating home directory: %s", homeErr)
+		}
+
+		file, err := os.Create(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json"))
 
 		if err != nil {
 			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
