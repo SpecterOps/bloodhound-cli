@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2025-7-1
+
+### Added
+
+* Added support for a dedicated home directory to act as the home for the JSON configuration file and Docker YAML files
+  * Added a `home_directory` value to the JSON configuration file to control the home directory path
+  * The default value is the user's home directory and `.BloodHound` (i.e., the equivalent of `~/.BloodHound`)
+  * You can place and run BloodHound CLI from any location, and it will always look in the home directory for the JSON and YAML files
+* Added checks that ensure the configured home directory will work as expected every time BloodHound CLI is run
+  * The first check ensures the directory exists and creates the directory if it does not
+  * The second check ensures the home directory has proper permissions that will allow BloodHound CLI to read and write (e.g., `0600`)
+    * Permissions may exceed `0600`, but must at least allow read and write for the current user
+
+### Changed
+
+* Every command that runs a Docker command will now ensure the required YAML file exists before proceeding
+
 ## [0.1.6] - 2025-4-23
 
 ### Added
