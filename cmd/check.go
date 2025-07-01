@@ -23,7 +23,7 @@ func init() {
 }
 
 func evaluateBloodHound(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus(true)
+	err := docker.EvaluateDockerComposeStatus()
 	if err != nil {
 		return
 	}
