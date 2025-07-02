@@ -24,10 +24,12 @@ certain actions (e.g., creating the default user) can and should only be done on
 	Run: installBloodHound,
 }
 
+// init registers the install command with the root command, making it available in the CLI.
 func init() {
 	rootCmd.AddCommand(installCmd)
 }
 
+// installBloodHound sets up the BloodHound environment by verifying Docker Compose status, creating the required home directory, and launching the Docker containers using the installation configuration.
 func installBloodHound(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	homeErr := docker.MakeHomeDir()
