@@ -91,7 +91,7 @@ func checkJsonFileExistsAndCreate() {
 		file, err := os.Create(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json"))
 
 		if err != nil {
-			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
+			log.Fatalf("The JSON config file doesn't exist and couldn't be created.")
 		}
 
 		defer func(file *os.File) {
@@ -159,7 +159,7 @@ func GetConfig(args []string) Configurations {
 		setting := strings.ToLower(args[i])
 		val := bhEnv.GetString(setting)
 		if val == "" {
-			log.Fatalf("Config variable `%s` not found", setting)
+			log.Fatalf("Config variable `%s` not found.", setting)
 		} else {
 			values = append(values, Configuration{setting, val})
 		}

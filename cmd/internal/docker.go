@@ -57,22 +57,21 @@ func (c Containers) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-// EvaluateDockerComposeStatus determines if the host has the "docker compose" plugin or the "docker compose"
 // EvaluateDockerComposeStatus checks if Docker and Docker Compose are installed and operational on the system.
 // It verifies the presence of the Docker CLI, ensures the Docker daemon is running, and checks for either the Docker Compose plugin or the legacy docker-compose script, setting the global dockerCmd variable accordingly.
 // Returns an error if all checks pass; otherwise, the function logs a fatal error and terminates the process.
-func EvaluateDockerComposeStatus() error {
+func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
 	dockerExists := CheckPath("docker")
 	if !dockerExists {
-		log.Fatalln("Docker is not installed on this system, so please install Docker and try again")
+		log.Fatalln("Docker is not installed on this system, so please install Docker and try again.")
 	}
 
 	// Check if the Docker Engine is running
 	_, engineErr := RunBasicCmd("docker", []string{"info"})
 	if engineErr != nil {
-		log.Fatalln("Docker is installed on this system, but the daemon is not running")
+		log.Fatalln("Docker is installed on this system, but the daemon is not running.")
 	}
 
 	// Check for the ``compose`` plugin as our first choice
@@ -90,8 +89,6 @@ func EvaluateDockerComposeStatus() error {
 	}
 
 	fmt.Println("[+] Docker and the Compose plugin checks have passed")
-
-	return nil
 }
 
 // DownloadDockerComposeFiles downloads production and development Docker Compose YAML files if confirmed by the user.
@@ -185,7 +182,7 @@ func RunDockerComposeUninstall(yaml string) {
 	if delErr != nil {
 		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
 	} else {
-		fmt.Println("[+] Successfully delete the BloodHound home directory!")
+		fmt.Println("[+] Successfully deleted the BloodHound home directory!")
 	}
 	fmt.Println("[+] Uninstall was successful. You can re-install with `./bloodhound-cli install`.")
 	fmt.Println("[+] The home directory and config will be recreated if you continue using BloodHound CLI.")

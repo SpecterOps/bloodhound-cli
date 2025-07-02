@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // containersUpCmd represents the up command
@@ -24,5 +23,5 @@ func init() {
 func containersUp(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing up the BloodHound environment")
-	docker.RunDockerComposeUp(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposeUp(docker.GetYamlFilePath())
 }

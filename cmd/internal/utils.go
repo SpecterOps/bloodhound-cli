@@ -40,7 +40,7 @@ func (c HealthIssues) Swap(i, j int) {
 func GetCwdFromExe() string {
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	return filepath.Dir(exe)
 }
@@ -82,29 +82,28 @@ func GetDefaultHomeDir() string {
 
 // GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "home_directory".
 func GetBloodHoundDir() string {
-	homeDir := bhEnv.GetString("home_directory")
-	return filepath.Join(homeDir)
+	return bhEnv.GetString("home_directory")
 }
 
-// MakeHomeDir ensures the configured BloodHound home directory exists, creating it with permissions 0600 if necessary.
+// MakeHomeDir ensures the configured BloodHound home directory exists, creating it with permissions 0777 if necessary.
 // Returns an error if directory creation fails.
 func MakeHomeDir() error {
 	homeDir := GetBloodHoundDir()
 	if !DirExists(homeDir) {
-		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it\n", homeDir)
-		mkErr := os.MkdirAll(homeDir, 0600)
+		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it.\n", homeDir)
+		mkErr := os.MkdirAll(homeDir, 0777)
 		if mkErr != nil {
 			return mkErr
 		}
-		log.Println("Successfully created the BloodHound home directory")
+		log.Println("Successfully created the BloodHound home directory.")
+		log.Println("Note: The directory is open to all users (mask 0777). If you will be the only user, feel free to make adjustments.")
 	}
 
 	return nil
 }
 
-// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has full
-// access and no other users have access. This is intended as a secure baseline. A more permissive permissions set won't
-// CheckHomeDir verifies that the directory at the given path has at least user read and write permissions (0600).
+// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has R/W
+// access and BloodHound CLI can function. A more permissive mode won't trigger any errors.
 // It returns true if the permissions are sufficient, along with any error encountered during the stat operation.
 func CheckHomeDir(path string) (bool, error) {
 	info, err := os.Stat(path)
@@ -128,6 +127,11 @@ func DeleteDir(path string) error {
 	}
 
 	return nil
+}
+
+// GetYamlFilePath joins and returns the directory path of the BloodHound home directory with the Docker Compose YAML file.
+func GetYamlFilePath() string {
+	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
 }
 
 // CheckYamlExists determines if the specified file exists and logs a fatal warning if it does not. It is a wrapper for
@@ -170,7 +174,7 @@ func RunCmd(name string, args []string) error {
 	}
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	exePath := filepath.Dir(exe)
 	command := exec.Command(path, args...)

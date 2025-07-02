@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // updateCmd represents the update command
@@ -21,10 +20,7 @@ func init() {
 
 // updateBloodHound checks the status of Docker Compose and pulls the latest BloodHound container images if available.
 func updateBloodHound(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus()
-	if err != nil {
-		return
-	}
+	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Checking for BloodHound image updates...")
-	docker.RunDockerComposePull(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposePull(docker.GetYamlFilePath())
 }
