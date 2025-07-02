@@ -20,6 +20,7 @@ func init() {
 	containersCmd.AddCommand(containersStopCmd)
 }
 
+// containersStop stops all BloodHound Docker Compose services without removing their containers.
 func containersStop(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Stopping the BloodHound environment")

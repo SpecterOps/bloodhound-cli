@@ -58,7 +58,7 @@ func FileExists(path string) bool {
 }
 
 // DirExists determines if a given string is a valid directory.
-// Reference: https://golangcode.com/check-if-a-file-exists/
+// DirExists reports whether the specified path exists and is a directory. Returns false if the path does not exist.
 func DirExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -70,7 +70,8 @@ func DirExists(path string) bool {
 }
 
 // GetDefaultHomeDir returns the path for the default BloodHound home directory for initial config creation.
-// The initial path will always be a hidden `.BloodHound` directory inside the current user's home directory.
+// GetDefaultHomeDir returns the default BloodHound home directory path as a hidden `.BloodHound` folder inside the current user's home directory.
+// Logs a fatal error if the user's home directory cannot be determined.
 func GetDefaultHomeDir() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -79,13 +80,14 @@ func GetDefaultHomeDir() string {
 	return filepath.Join(homeDir, ".BloodHound")
 }
 
-// GetBloodHoundDir returns the full path configured as the home directory.
+// GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "home_directory".
 func GetBloodHoundDir() string {
 	homeDir := bhEnv.GetString("home_directory")
 	return filepath.Join(homeDir)
 }
 
-// MakeHomeDir checks if the configured home directory exists and creates it if it does not.
+// MakeHomeDir ensures the configured BloodHound home directory exists, creating it with permissions 0600 if necessary.
+// Returns an error if directory creation fails.
 func MakeHomeDir() error {
 	homeDir := GetBloodHoundDir()
 	if !DirExists(homeDir) {
@@ -102,7 +104,8 @@ func MakeHomeDir() error {
 
 // CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has full
 // access and no other users have access. This is intended as a secure baseline. A more permissive permissions set won't
-// trigger any errors.
+// CheckHomeDir verifies that the directory at the given path has at least user read and write permissions (0600).
+// It returns true if the permissions are sufficient, along with any error encountered during the stat operation.
 func CheckHomeDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -114,7 +117,8 @@ func CheckHomeDir(path string) (bool, error) {
 }
 
 // DeleteDir deletes the configured home directory and all contents. This is intended as the final step of the
-// `uninstall` command.
+// DeleteDir removes the directory at the specified path and all its contents if it exists.
+// Returns any error encountered during removal.
 func DeleteDir(path string) error {
 	if DirExists(path) {
 		delErr := os.RemoveAll(path)
@@ -127,7 +131,8 @@ func DeleteDir(path string) error {
 }
 
 // CheckYamlExists determines if the specified file exists and logs a fatal warning if it does not. It is a wrapper for
-// the `FileExists` function and is intended to check YAML files just before executing Docker commands.
+// CheckYamlExists verifies that a YAML file exists at the specified path.
+// If the file does not exist, it logs a fatal error with instructions for obtaining the required YAML file.
 func CheckYamlExists(path string) {
 	if !FileExists(path) {
 		log.Fatalf(
@@ -138,7 +143,7 @@ func CheckYamlExists(path string) {
 }
 
 // CheckPath checks the $PATH environment variable for a given "cmd" and return a "bool"
-// indicating if it exists.
+// CheckPath returns true if the specified command exists in the system's PATH.
 func CheckPath(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil

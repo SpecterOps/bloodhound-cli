@@ -29,6 +29,8 @@ func init() {
 	rootCmd.AddCommand(uninstallCmd)
 }
 
+// uninstallBloodHound removes all BloodHound Docker containers, images, and volumes when the uninstall command is invoked.
+// It first checks the Docker Compose environment status and proceeds with the uninstallation if no errors are detected.
 func uninstallBloodHound(cmd *cobra.Command, args []string) {
 	err := docker.EvaluateDockerComposeStatus()
 	if err != nil {
