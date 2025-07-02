@@ -9,6 +9,10 @@ import (
 
 func TestEvaluateDockerComposeStatus(t *testing.T) {
 	// Mock the BloodHound Docker YAML files
+	homeDir := GetDefaultHomeDir()
+	err := os.MkdirAll(homeDir, 0755)
+	assert.NoError(t, err, "Expected directory creation to succeed")
+
 	localMockYaml := filepath.Join(GetDefaultHomeDir(), "docker-compose.dev.yml")
 	local, localErr := os.Create(localMockYaml)
 	prodMockYaml := filepath.Join(GetDefaultHomeDir(), "docker-compose.yml")
