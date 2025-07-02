@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // containersBuildCmd represents the build command
@@ -25,5 +24,5 @@ func init() {
 func buildContainers(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Starting build")
-	docker.RunDockerComposeUpgrade(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposeUpgrade(docker.GetYamlFilePath())
 }

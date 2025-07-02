@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // containersStopCmd represents the stop command
@@ -23,5 +22,5 @@ func init() {
 func containersStop(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Stopping the BloodHound environment")
-	docker.RunDockerComposeStop(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposeStop(docker.GetYamlFilePath())
 }

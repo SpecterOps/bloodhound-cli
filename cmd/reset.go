@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // resetPwdCmd represents the resetpwd command
@@ -37,5 +36,5 @@ func resetAdminPwd(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Println("[+] Resetting admin password")
-	docker.ResetAdminPassword(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.ResetAdminPassword(docker.GetYamlFilePath())
 }

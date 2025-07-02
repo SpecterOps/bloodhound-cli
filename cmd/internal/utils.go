@@ -126,6 +126,11 @@ func DeleteDir(path string) error {
 	return nil
 }
 
+// GetYamlFilePath joins and returns the directory path of the BloodHound home directory with the Docker Compose YAML file.
+func GetYamlFilePath() string {
+	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
+}
+
 // CheckYamlExists determines if the specified file exists and logs a fatal warning if it does not. It is a wrapper for
 // the `FileExists` function and is intended to check YAML files just before executing Docker commands.
 func CheckYamlExists(path string) {

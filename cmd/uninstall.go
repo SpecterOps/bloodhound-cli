@@ -4,7 +4,6 @@ import (
 	"fmt"
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
-	"path/filepath"
 )
 
 // installCmd represents the install command
@@ -35,5 +34,5 @@ func uninstallBloodHound(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Println("[+] Starting BloodHound environment removal")
-	docker.RunDockerComposeUninstall(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposeUninstall(docker.GetYamlFilePath())
 }

@@ -5,7 +5,6 @@ import (
 	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
 	"github.com/spf13/cobra"
 	"log"
-	"path/filepath"
 )
 
 // installCmd represents the install command
@@ -39,5 +38,5 @@ func installBloodHound(cmd *cobra.Command, args []string) {
 		log.Fatalf("Error creating home directory: %v", homeErr)
 	}
 	fmt.Println("[+] Starting BloodHound environment installation")
-	docker.RunDockerComposeInstall(filepath.Join(docker.GetBloodHoundDir(), "docker-compose.yml"))
+	docker.RunDockerComposeInstall(docker.GetYamlFilePath())
 }
