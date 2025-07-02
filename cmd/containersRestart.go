@@ -19,6 +19,7 @@ func init() {
 	containersCmd.AddCommand(containersRestartCmd)
 }
 
+// containersRestart restarts all BloodHound services using the Docker Compose file located in the BloodHound directory.
 func containersRestart(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Restarting the BloodHound environment")

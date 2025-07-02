@@ -18,6 +18,7 @@ func init() {
 	rootCmd.AddCommand(updateCmd)
 }
 
+// updateBloodHound checks the status of Docker Compose and pulls the latest BloodHound container images if available.
 func updateBloodHound(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Checking for BloodHound image updates...")

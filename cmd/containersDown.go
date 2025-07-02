@@ -23,6 +23,7 @@ func init() {
 	containersDownCmd.PersistentFlags().BoolVar(&volumes, "volumes", false, "Delete data volumes when containers come down")
 }
 
+// containersDown brings down all BloodHound Docker services and optionally removes their data volumes.
 func containersDown(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing down the BloodHound environment")

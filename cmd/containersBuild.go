@@ -21,6 +21,8 @@ func init() {
 	containersCmd.AddCommand(containersBuildCmd)
 }
 
+// buildContainers builds and upgrades BloodHound containers using Docker Compose.
+// It checks the current Docker Compose status before initiating the build process.
 func buildContainers(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Starting build")
