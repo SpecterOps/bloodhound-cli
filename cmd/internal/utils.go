@@ -6,6 +6,7 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"github.com/adrg/xdg"
 	"io"
 	"log"
 	"net/http"
@@ -72,11 +73,7 @@ func DirExists(path string) bool {
 // GetDefaultHomeDir returns the path for the default BloodHound home directory for initial config creation.
 // The initial path will always be a hidden `.BloodHound` directory inside the current user's home directory.
 func GetDefaultHomeDir() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatalf("Failed to get user's home directory path to set default home directory: %v", err)
-	}
-	return filepath.Join(homeDir, ".BloodHound")
+	return filepath.Join(xdg.DataHome, ".BloodHound")
 }
 
 // GetBloodHoundDir returns the full path configured as the home directory.
