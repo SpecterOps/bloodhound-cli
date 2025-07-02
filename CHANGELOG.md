@@ -4,18 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.7] - 2025-7-1
+## [0.1.7] - 2025-7-2
 
 ### Added
 
 * Added support for a dedicated home directory to act as the home for the JSON configuration file and Docker YAML files
   * Added a `home_directory` value to the JSON configuration file to control the home directory path
-  * The default value is the user's home directory and `.BloodHound` (i.e., the equivalent of `~/.BloodHound`)
-  * You can place and run BloodHound CLI from any location, and it will always look in the home directory for the JSON and YAML files
-* Added checks that ensure the configured home directory will work as expected every time BloodHound CLI is run
+  * The default value is the user's XDG data home directory and `.BloodHound`
+    * i.e., the equivalent of `~/.local/share` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
+  * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the home directory for the JSON and YAML files
+  * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users
+  * Users may reduce permissions or set a custom umask if sharing directory access will not be required for an installation
+* Added checks that ensure the configured home directory will work as expected every time BloodHound CLI runs
   * The first check ensures the directory exists and creates the directory if it does not
-  * The second check ensures the home directory has proper permissions that will allow BloodHound CLI to read and write (e.g., `0600`)
-    * Permissions may exceed `0600`, but must at least allow read and write for the current user
+  * The second check ensures the home directory has proper permissions that will allow BloodHound CLI to read and write (e.g., >= `0600`)
+    * Permissions may exceed `0600`, but must at least allow the current user to read and write
 
 ### Changed
 
