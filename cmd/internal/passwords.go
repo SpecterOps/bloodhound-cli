@@ -22,7 +22,7 @@ func GenerateRandomPassword(pwLength int, safe bool) string {
 	for i := 0; i < pwLength; i++ {
 		nBig, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
 		if err != nil {
-			log.Fatalf("Failed to generate random number for password generation\n")
+			log.Fatalf("Failed to generate random number for password generation.\n")
 		}
 		b.WriteRune(chars[nBig.Int64()])
 	}

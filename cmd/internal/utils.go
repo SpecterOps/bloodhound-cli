@@ -40,7 +40,7 @@ func (c HealthIssues) Swap(i, j int) {
 func GetCwdFromExe() string {
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	return filepath.Dir(exe)
 }
@@ -170,7 +170,7 @@ func RunCmd(name string, args []string) error {
 	}
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	exePath := filepath.Dir(exe)
 	command := exec.Command(path, args...)
