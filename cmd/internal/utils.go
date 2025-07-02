@@ -81,28 +81,28 @@ func GetDefaultHomeDir() string {
 
 // GetBloodHoundDir returns the full path configured as the home directory.
 func GetBloodHoundDir() string {
-	homeDir := bhEnv.GetString("home_directory")
-	return filepath.Join(homeDir)
+	return bhEnv.GetString("home_directory")
 }
 
-// MakeHomeDir checks if the configured home directory exists and creates it if it does not.
+// MakeHomeDir checks if the configured home directory exists and creates it if it does not. The directory is created
+// with permissions set to 0700.
 func MakeHomeDir() error {
 	homeDir := GetBloodHoundDir()
 	if !DirExists(homeDir) {
-		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it\n", homeDir)
-		mkErr := os.MkdirAll(homeDir, 0600)
+		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it.\n", homeDir)
+		mkErr := os.MkdirAll(homeDir, 0777)
 		if mkErr != nil {
 			return mkErr
 		}
-		log.Println("Successfully created the BloodHound home directory")
+		log.Println("Successfully created the BloodHound home directory.")
+		log.Println("Note: The directory is open to all users (mask 0777). If you will be the only user, feel free to make adjustments.")
 	}
 
 	return nil
 }
 
-// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has full
-// access and no other users have access. This is intended as a secure baseline. A more permissive permissions set won't
-// trigger any errors.
+// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has R/W
+// access and BloodHound CLI can function. A more permissive mode won't trigger any errors.
 func CheckHomeDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
