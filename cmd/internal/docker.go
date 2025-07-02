@@ -176,9 +176,11 @@ func RunDockerComposeUninstall(yaml string) {
 		os.Exit(0)
 	}
 
-	delErr := DeleteHomeDir(homeDir)
+	delErr := DeleteDir(homeDir)
 	if delErr != nil {
 		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
+	} else {
+		fmt.Println("[+] Successfully delete the BloodHound home directory!")
 	}
 	fmt.Println("[+] Uninstall was successful. You can re-install with `./bloodhound-cli install`.")
 	fmt.Println("[+] The home directory and config will be recreated if you continue using BloodHound CLI.")

@@ -113,16 +113,14 @@ func CheckHomeDir(path string) (bool, error) {
 	return mode&baselinePerms == baselinePerms, nil
 }
 
-// DeleteHomeDir deletes the configured home directory and all contents. This is intended as the final step of the
+// DeleteDir deletes the configured home directory and all contents. This is intended as the final step of the
 // `uninstall` command.
-func DeleteHomeDir(path string) error {
-	homeDir := bhEnv.GetString("home_directory")
-	if DirExists(homeDir) {
-		delErr := os.RemoveAll(homeDir)
+func DeleteDir(path string) error {
+	if DirExists(path) {
+		delErr := os.RemoveAll(path)
 		if delErr != nil {
 			return delErr
 		}
-		log.Println("Successfully delete the BloodHound home directory")
 	}
 
 	return nil
