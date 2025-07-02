@@ -59,7 +59,7 @@ func (c Containers) Swap(i, j int) {
 
 // EvaluateDockerComposeStatus determines if the host has the "docker compose" plugin or the "docker compose"
 // script installed and set the global `dockerCmd` variable.
-func EvaluateDockerComposeStatus() error {
+func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
 	dockerExists := CheckPath("docker")
@@ -88,8 +88,6 @@ func EvaluateDockerComposeStatus() error {
 	}
 
 	fmt.Println("[+] Docker and the Compose plugin checks have passed")
-
-	return nil
 }
 
 // DownloadDockerComposeFiles downloads production and development Docker Compose YAML files if confirmed by the user.

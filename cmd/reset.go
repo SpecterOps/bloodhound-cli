@@ -31,10 +31,7 @@ func init() {
 }
 
 func resetAdminPwd(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus()
-	if err != nil {
-		return
-	}
+	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Resetting admin password")
 	docker.ResetAdminPassword(docker.GetYamlFilePath())
 }

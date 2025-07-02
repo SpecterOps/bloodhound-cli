@@ -29,10 +29,7 @@ func init() {
 }
 
 func installBloodHound(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus()
-	if err != nil {
-		return
-	}
+	docker.EvaluateDockerComposeStatus()
 	homeErr := docker.MakeHomeDir()
 	if homeErr != nil {
 		log.Fatalf("Error creating home directory: %v", homeErr)
