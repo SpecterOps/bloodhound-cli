@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added support for a dedicated home directory to act as the home for the JSON configuration file and Docker YAML files
   * Added a `home_directory` value to the JSON configuration file to control the home directory path
-  * The default value is the user's XDG data home directory and `.BloodHound`
-    * i.e., the equivalent of `~/.local/share` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
+  * The default value is the user's XDG config home directory and `BloodHound`
+    * i.e., the equivalent of `~/.config` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
   * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the home directory for the JSON and YAML files
   * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users
   * Users may reduce permissions or set a custom umask if sharing directory access will not be required for an installation

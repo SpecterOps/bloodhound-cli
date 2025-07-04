@@ -69,11 +69,10 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-// GetDefaultHomeDir returns the path for the default BloodHound home directory for initial config creation.
 // GetDefaultHomeDir returns the default BloodHound home directory path as a hidden `.BloodHound` folder inside the current user's home directory.
 // Logs a fatal error if the user's home directory cannot be determined.
 func GetDefaultHomeDir() string {
-	return filepath.Join(xdg.DataHome, ".BloodHound")
+	return filepath.Join(xdg.ConfigHome, "BloodHound")
 }
 
 // GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "home_directory".
