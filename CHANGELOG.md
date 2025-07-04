@@ -14,11 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * i.e., the equivalent of `~/.config` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
   * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the home directory for the JSON and YAML files
   * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users
-  * Users may reduce permissions or set a custom umask if sharing directory access will not be required for an installation
+  * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so a umask of `0022` will set the permissions to `0755`
 * Added checks that ensure the configured home directory will work as expected every time BloodHound CLI runs
   * The first check ensures the directory exists and creates the directory if it does not
-  * The second check ensures the home directory has proper permissions that will allow BloodHound CLI to read and write (e.g., >= `0600`)
-    * Permissions may exceed `0600`, but must at least allow the current user to read and write
+  * The second check ensures the home directory has proper permissions that will allow BloodHound CLI to read and write
 
 ### Changed
 
