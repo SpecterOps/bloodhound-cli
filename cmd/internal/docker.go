@@ -91,8 +91,6 @@ func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Docker and the Compose plugin checks have passed")
 }
 
-// DownloadDockerComposeFiles downloads production and development Docker Compose YAML files if confirmed by the user.
-// Prompts the user before overwriting existing files in the current working directory.
 // DownloadDockerComposeFiles downloads the production and development Docker Compose YAML files into the BloodHound directory.
 // If either file already exists, prompts the user for confirmation before overwriting. Exits fatally on download failure.
 func DownloadDockerComposeFiles() {
@@ -134,7 +132,6 @@ func EvaluateEnvironment() {
 	DownloadDockerComposeFiles()
 }
 
-// RunDockerComposeInstall executes the "docker compose" commands for a first-time installation with
 // RunDockerComposeInstall performs a first-time installation of BloodHound containers using the specified Docker Compose YAML file.
 // It ensures required YAML files are present, pulls container images, and starts the environment in detached mode.
 // Prints login credentials and UI access information upon successful setup. Exits fatally on errors.
@@ -157,8 +154,10 @@ func RunDockerComposeInstall(yaml string) {
 	fmt.Printf("[+] You can access the BloodHound UI at: %s%s\n", bhEnv.GetString("root_url"), loginUri)
 }
 
-// RunDockerComposeUninstall executes the "docker compose" commands to bring down containers and remove containers,
-// RunDockerComposeUninstall removes all BloodHound containers, images, and volumes defined in the specified Docker Compose YAML file, then optionally deletes the BloodHound home directory after user confirmation. The process is interactive and exits if the user declines any confirmation prompt. Fatal errors are logged if uninstallation or directory deletion fails.
+// RunDockerComposeUninstall removes all BloodHound containers, images, and volumes defined in the specified Docker
+// Compose YAML file, then optionally deletes the BloodHound home directory after user confirmation. The process is
+// interactive and exits if the user declines any confirmation prompt. Fatal errors are logged if uninstallation or
+// directory deletion fails.
 func RunDockerComposeUninstall(yaml string) {
 	c := AskForConfirmation("[!] This command removes all containers, images, and volume data. Are you sure you want to uninstall?")
 	if !c {
@@ -188,7 +187,6 @@ func RunDockerComposeUninstall(yaml string) {
 	fmt.Println("[+] The home directory and config will be recreated if you continue using BloodHound CLI.")
 }
 
-// RunDockerComposeUpgrade executes the "docker compose" commands for re-building or upgrading an
 // RunDockerComposeUpgrade rebuilds and restarts all containers defined in the specified Docker Compose YAML file.
 // It brings down any running containers, rebuilds images, and brings the environment back up in detached mode.
 // Exits fatally if any Docker command fails.
@@ -210,7 +208,6 @@ func RunDockerComposeUpgrade(yaml string) {
 	fmt.Println("[+] All containers have been built!")
 }
 
-// RunDockerComposeStart executes the "docker compose" commands to start the environment with
 // RunDockerComposeStart starts all services defined in the specified Docker Compose YAML file.
 // Exits fatally if the YAML file does not exist or if starting the containers fails.
 func RunDockerComposeStart(yaml string) {
@@ -222,7 +219,6 @@ func RunDockerComposeStart(yaml string) {
 	}
 }
 
-// RunDockerComposeStop executes the "docker compose" commands to stop all services in the environment with
 // RunDockerComposeStop stops all services defined in the specified Docker Compose YAML file.
 // Exits the program if stopping services fails.
 func RunDockerComposeStop(yaml string) {
@@ -234,7 +230,6 @@ func RunDockerComposeStop(yaml string) {
 	}
 }
 
-// RunDockerComposeRestart executes the "docker compose" commands to restart the environment with
 // RunDockerComposeRestart restarts all containers defined in the specified Docker Compose YAML file.
 // Exits fatally if the YAML file does not exist or if the restart operation fails.
 func RunDockerComposeRestart(yaml string) {
@@ -246,8 +241,8 @@ func RunDockerComposeRestart(yaml string) {
 	}
 }
 
-// RunDockerComposeUp executes the "docker compose" commands to bring up the environment with
-// RunDockerComposeUp brings up Docker containers in detached mode using the specified Docker Compose YAML file. Exits fatally if the YAML file does not exist or if the command fails.
+// RunDockerComposeUp brings up Docker containers in detached mode using the specified Docker Compose YAML file.
+// Exits fatally if the YAML file does not exist or if the command fails.
 func RunDockerComposeUp(yaml string) {
 	fmt.Printf("[+] Running `%s` to bring up the containers with %s...\n", dockerCmd, yaml)
 	CheckYamlExists(yaml)
@@ -257,7 +252,6 @@ func RunDockerComposeUp(yaml string) {
 	}
 }
 
-// RunDockerComposeDown executes the "docker compose" commands to bring down the environment with
 // RunDockerComposeDown stops and removes containers defined in the specified Docker Compose YAML file.
 // If volumes is true, associated Docker volumes are also removed. Exits fatally on failure.
 func RunDockerComposeDown(yaml string, volumes bool) {

@@ -58,7 +58,6 @@ func FileExists(path string) bool {
 	return !info.IsDir()
 }
 
-// DirExists determines if a given string is a valid directory.
 // DirExists reports whether the specified path exists and is a directory. Returns false if the path does not exist.
 func DirExists(path string) bool {
 	info, err := os.Stat(path)
@@ -128,7 +127,6 @@ func CheckYamlExists(path string) {
 	}
 }
 
-// CheckPath checks the $PATH environment variable for a given "cmd" and return a "bool"
 // CheckPath returns true if the specified command exists in the system's PATH.
 func CheckPath(cmd string) bool {
 	_, err := exec.LookPath(cmd)

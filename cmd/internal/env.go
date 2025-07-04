@@ -78,9 +78,9 @@ func WriteBloodHoundEnvironmentVariables() {
 	}
 }
 
-// checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
-// It also checks if the configured home directory exists, creates it if it does not, and then checks if the directory
-// checkJsonFileExistsAndCreate ensures that the BloodHound JSON configuration file exists in the designated directory with proper permissions, creating the file and home directory if necessary. If the file or directory cannot be created or permissions are insufficient, the function logs a fatal error and terminates the program.
+// checkJsonFileExistsAndCreate ensures that the BloodHound JSON configuration file exists in the designated directory
+// with proper permissions, creating the file and home directory if necessary. If the file or directory cannot be
+// created or permissions are insufficient, the function logs a fatal error and terminates the program.
 func checkJsonFileExistsAndCreate() {
 	if !FileExists(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")) {
 		homeErr := MakeHomeDir()
@@ -118,10 +118,9 @@ func checkJsonFileExistsAndCreate() {
 	}
 }
 
-// ParseBloodHoundEnvironmentVariables attempts to find and open an existing JSON config file or create a new one.
-// If a JSON config file is found, load it into the Viper configuration.
-// If a JSON config file is not found, create a new one with default values.
-// ParseBloodHoundEnvironmentVariables initializes default configuration values, ensures the BloodHound config file and directory exist with correct permissions, loads configuration from the JSON file and environment variables, and writes the final configuration back to the file. The function terminates the program on critical errors.
+// ParseBloodHoundEnvironmentVariables initializes default configuration values, ensures the BloodHound config file and
+// directory exist with correct permissions, loads configuration from the JSON file and environment variables, and
+// writes the final configuration back to the file. The function terminates the program on critical errors.
 func ParseBloodHoundEnvironmentVariables() {
 	setBloodHoundConfigDefaultValues()
 	bhEnv.SetConfigName("bloodhound.config.json")
