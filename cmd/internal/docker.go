@@ -178,7 +178,7 @@ func RunDockerComposeUninstall(yaml string) {
 		os.Exit(0)
 	}
 
-	delErr := DeleteDir(homeDir)
+	delErr := os.RemoveAll(homeDir)
 	if delErr != nil {
 		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
 	} else {
@@ -273,11 +273,10 @@ func RunDockerComposeDown(yaml string, volumes bool) {
 	}
 }
 
-// RunDockerComposePull executes the "docker compose" commands to pull the latest container images for
 // RunDockerComposePull pulls the latest container images defined in the specified Docker Compose YAML file.
 // Exits fatally if the YAML file does not exist or if the pull operation fails.
 func RunDockerComposePull(yaml string) {
-	fmt.Printf("[+] Running `%s` to pull container imahes with %s...\n", dockerCmd, yaml)
+	fmt.Printf("[+] Running `%s` to pull container images with %s...\n", dockerCmd, yaml)
 	CheckYamlExists(yaml)
 	startErr := RunCmd(dockerCmd, []string{"-f", yaml, "pull"})
 	if startErr != nil {

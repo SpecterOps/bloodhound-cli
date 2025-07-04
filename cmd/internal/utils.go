@@ -112,26 +112,11 @@ func CheckHomeDir(path string) (bool, error) {
 	return mode&baselinePerms == baselinePerms, nil
 }
 
-// DeleteDir deletes the configured home directory and all contents. This is intended as the final step of the
-// DeleteDir removes the directory at the specified path and all its contents if it exists.
-// Returns any error encountered during removal.
-func DeleteDir(path string) error {
-	if DirExists(path) {
-		delErr := os.RemoveAll(path)
-		if delErr != nil {
-			return delErr
-		}
-	}
-
-	return nil
-}
-
 // GetYamlFilePath joins and returns the directory path of the BloodHound home directory with the Docker Compose YAML file.
 func GetYamlFilePath() string {
 	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
 }
 
-// CheckYamlExists determines if the specified file exists and logs a fatal warning if it does not. It is a wrapper for
 // CheckYamlExists verifies that a YAML file exists at the specified path.
 // If the file does not exist, it logs a fatal error with instructions for obtaining the required YAML file.
 func CheckYamlExists(path string) {
