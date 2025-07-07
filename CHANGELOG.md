@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.7] - 2025-7-2
+## [0.1.7] - 2025-7-7
 
 ### Added
 
@@ -12,9 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Added a `data_directory` value to the JSON configuration file to control the home directory path
   * The default value is the user's XDG config home directory and `bloodhound`
     * i.e., the equivalent of `~/.config` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
+      * i.e., the equivalent of `~/.config/BloodHound` on Unix, \
+        `~/Library/Application Support/BloodHound` on macOS, and \
+        `%LOCALAPPDATA%\BloodHound` on Windows
     * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound, so we add to that directory if it exists
   * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the home directory for the JSON and YAML files
-  * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users
+  * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
   * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so a umask of `0022` will set the permissions to `0755`
 * Added checks that ensure the configured home directory will work as expected every time BloodHound CLI runs
   * The first check ensures the directory exists and creates the directory if it does not
