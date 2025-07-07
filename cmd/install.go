@@ -32,7 +32,7 @@ func init() {
 // installBloodHound sets up the BloodHound environment by verifying Docker Compose status, creating the required home directory, and launching the Docker containers using the installation configuration.
 func installBloodHound(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
-	homeErr := docker.MakeHomeDir()
+	homeErr := docker.MakeDataDir()
 	if homeErr != nil {
 		log.Fatalf("Error creating home directory: %v", homeErr)
 	}

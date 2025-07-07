@@ -69,24 +69,24 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-// GetDefaultHomeDir returns the default BloodHound home directory path as a hidden `.BloodHound` folder inside the current user's home directory.
+// GetDefaultDataDir returns the default BloodHound data directory path as a `bloodhound` folder inside the current user's data directory.
 // Logs a fatal error if the user's home directory cannot be determined.
-func GetDefaultHomeDir() string {
-	return filepath.Join(xdg.ConfigHome, "BloodHound")
+func GetDefaultDataDir() string {
+	return filepath.Join(xdg.ConfigHome, "bloodhound")
 }
 
-// GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "home_directory".
+// GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "data_directory".
 func GetBloodHoundDir() string {
-	return bhEnv.GetString("home_directory")
+	return bhEnv.GetString("data_directory")
 }
 
-// MakeHomeDir ensures the configured BloodHound home directory exists, creating it with permissions 0777 if necessary.
+// MakeDataDir ensures the configured BloodHound data directory exists, creating it with permissions 0777 if necessary.
 // Returns an error if directory creation fails.
-func MakeHomeDir() error {
-	homeDir := GetBloodHoundDir()
-	if !DirExists(homeDir) {
-		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it.\n", homeDir)
-		mkErr := os.MkdirAll(homeDir, 0777)
+func MakeDataDir() error {
+	dataDir := GetBloodHoundDir()
+	if !DirExists(dataDir) {
+		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it.\n", dataDir)
+		mkErr := os.MkdirAll(dataDir, 0777)
 		if mkErr != nil {
 			return mkErr
 		}
@@ -97,10 +97,10 @@ func MakeHomeDir() error {
 	return nil
 }
 
-// CheckHomeDir checks if the home directory's permissions are at least 0600. This ensures the current user has R/W
+// CheckDataDir checks if the data directory's permissions are at least 0600. This ensures the current user has R/W
 // access and BloodHound CLI can function. A more permissive mode won't trigger any errors.
 // It returns true if the permissions are sufficient, along with any error encountered during the stat operation.
-func CheckHomeDir(path string) (bool, error) {
+func CheckDataDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false, err
@@ -133,7 +133,7 @@ func CheckPath(cmd string) bool {
 }
 
 // RunBasicCmd executes a given command ("name") with a list of arguments ("args")
-// and return a "string" with the output.
+// and returns a "string" with the output.
 func RunBasicCmd(name string, args []string) (string, error) {
 	out, err := exec.Command(name, args...).Output()
 	output := string(out[:])

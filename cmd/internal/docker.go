@@ -171,13 +171,13 @@ func RunDockerComposeUninstall(yaml string) {
 		log.Fatalf("Error trying to uninstall with %s: %v\n", yaml, uninstallErr)
 	}
 
-	homeDir := GetBloodHoundDir()
-	delConf := AskForConfirmation("[!] Do you want to also delete the home directory, " + homeDir + ", and its contents?")
+	dataDir := GetBloodHoundDir()
+	delConf := AskForConfirmation("[!] Do you want to also delete the home directory, " + dataDir + ", and its contents?")
 	if !delConf {
 		os.Exit(0)
 	}
 
-	delErr := os.RemoveAll(homeDir)
+	delErr := os.RemoveAll(dataDir)
 	if delErr != nil {
 		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
 	} else {

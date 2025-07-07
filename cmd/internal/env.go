@@ -66,7 +66,7 @@ func setBloodHoundConfigDefaultValues() {
 	// Set some helpful aliases for common settings
 	bhEnv.RegisterAlias("default_password", "default_admin.password")
 
-	bhEnv.SetDefault("home_directory", GetDefaultHomeDir())
+	bhEnv.SetDefault("data_directory", GetDefaultDataDir())
 }
 
 // WriteBloodHoundEnvironmentVariables writes the current BloodHound configuration to the JSON config file, ensuring the file exists before writing. Logs a fatal error and exits if writing fails.
@@ -83,7 +83,7 @@ func WriteBloodHoundEnvironmentVariables() {
 // created or permissions are insufficient, the function logs a fatal error and terminates the program.
 func checkJsonFileExistsAndCreate() {
 	if !FileExists(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")) {
-		homeErr := MakeHomeDir()
+		homeErr := MakeDataDir()
 		if homeErr != nil {
 			log.Fatalf("Error creating home directory: %s", homeErr)
 		}
@@ -107,7 +107,7 @@ func checkJsonFileExistsAndCreate() {
 			log.Fatalf("Failed to write JSON to file: %v", err)
 		}
 	} else {
-		permCheck, permErr := CheckHomeDir(GetBloodHoundDir())
+		permCheck, permErr := CheckDataDir(GetBloodHoundDir())
 		if permErr != nil {
 			log.Fatalf("Error checking the permissions on the home directory: %s", permErr)
 		}
