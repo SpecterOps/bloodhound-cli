@@ -155,7 +155,7 @@ func RunDockerComposeInstall(yaml string) {
 }
 
 // RunDockerComposeUninstall removes all BloodHound containers, images, and volumes defined in the specified Docker
-// Compose YAML file, then optionally deletes the BloodHound home directory after user confirmation. The process is
+// Compose YAML file, then optionally deletes the BloodHound config directory after user confirmation. The process is
 // interactive and exits if the user declines any confirmation prompt. Fatal errors are logged if uninstallation or
 // directory deletion fails.
 func RunDockerComposeUninstall(yaml string) {
@@ -171,20 +171,20 @@ func RunDockerComposeUninstall(yaml string) {
 		log.Fatalf("Error trying to uninstall with %s: %v\n", yaml, uninstallErr)
 	}
 
-	dataDir := GetBloodHoundDir()
-	delConf := AskForConfirmation("[!] Do you want to also delete the home directory, " + dataDir + ", and its contents?")
+	configDir := GetBloodHoundDir()
+	delConf := AskForConfirmation("[!] Do you want to also delete the config directory, " + configDir + ", and its contents?")
 	if !delConf {
 		os.Exit(0)
 	}
 
-	delErr := os.RemoveAll(dataDir)
+	delErr := os.RemoveAll(configDir)
 	if delErr != nil {
-		log.Fatalf("Error trying to delete the home directory: %v\n", delErr)
+		log.Fatalf("Error trying to delete the config directory: %v\n", delErr)
 	} else {
-		fmt.Println("[+] Successfully deleted the BloodHound home directory!")
+		fmt.Println("[+] Successfully deleted the BloodHound config directory!")
 	}
 	fmt.Println("[+] Uninstall was successful. You can re-install with `./bloodhound-cli install`.")
-	fmt.Println("[+] The home directory and config will be recreated if you continue using BloodHound CLI.")
+	fmt.Println("[+] The config directory and JSON config file will be recreated if you continue using BloodHound CLI.")
 }
 
 // RunDockerComposeUpgrade rebuilds and restarts all containers defined in the specified Docker Compose YAML file.

@@ -69,38 +69,38 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-// GetDefaultDataDir returns the default BloodHound data directory path as a `bloodhound` folder inside the current user's data directory.
-// Logs a fatal error if the user's home directory cannot be determined.
-func GetDefaultDataDir() string {
+// GetDefaultConfigDir returns the default BloodHound config directory path as a `bloodhound` folder inside the current user's data directory.
+// Logs a fatal error if the user's config directory cannot be determined.
+func GetDefaultConfigDir() string {
 	return filepath.Join(xdg.ConfigHome, "bloodhound")
 }
 
-// GetBloodHoundDir returns the configured BloodHound home directory path from the environment variable "data_directory".
+// GetBloodHoundDir returns the configured BloodHound config directory path from the environment variable "config_directory".
 func GetBloodHoundDir() string {
-	return bhEnv.GetString("data_directory")
+	return bhEnv.GetString("config_directory")
 }
 
-// MakeDataDir ensures the configured BloodHound data directory exists, creating it with permissions 0777 if necessary.
+// MakeConfigDir ensures the configured BloodHound config directory exists, creating it with permissions 0777 if necessary.
 // Returns an error if directory creation fails.
-func MakeDataDir() error {
-	dataDir := GetBloodHoundDir()
-	if !DirExists(dataDir) {
-		log.Printf("The configured BloodHound home directory, %s, is missing, so attempting to create it.\n", dataDir)
-		mkErr := os.MkdirAll(dataDir, 0777)
+func MakeConfigDir() error {
+	configDir := GetBloodHoundDir()
+	if !DirExists(configDir) {
+		log.Printf("The BloodHound config directory you have set, %s, is missing, so attempting to create it.\n", configDir)
+		mkErr := os.MkdirAll(configDir, 0777)
 		if mkErr != nil {
 			return mkErr
 		}
-		log.Println("Successfully created the BloodHound home directory.")
+		log.Println("Successfully created the BloodHound config directory.")
 		log.Println("Note: The directory is open to all users (mask 0777). If you will be the only user, feel free to make adjustments.")
 	}
 
 	return nil
 }
 
-// CheckDataDir checks if the data directory's permissions are at least 0600. This ensures the current user has R/W
+// CheckConfigDir checks if the config directory's permissions are at least 0600. This ensures the current user has R/W
 // access and BloodHound CLI can function. A more permissive mode won't trigger any errors.
 // It returns true if the permissions are sufficient, along with any error encountered during the stat operation.
-func CheckDataDir(path string) (bool, error) {
+func CheckConfigDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false, err
@@ -110,7 +110,7 @@ func CheckDataDir(path string) (bool, error) {
 	return mode&baselinePerms == baselinePerms, nil
 }
 
-// GetYamlFilePath joins and returns the directory path of the BloodHound home directory with the Docker Compose YAML file.
+// GetYamlFilePath joins and returns the directory path of the BloodHound config directory with the Docker Compose YAML file.
 func GetYamlFilePath() string {
 	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
 }
@@ -120,7 +120,7 @@ func GetYamlFilePath() string {
 func CheckYamlExists(path string) {
 	if !FileExists(path) {
 		log.Fatalf(
-			"The YAML file %s does not exist! To continue, move your YAML file into the home directory or run "+
+			"The YAML file %s does not exist! To continue, move your YAML file into the config directory or run "+
 				"`./bloodhound-cli check` to download the necessary YAML file.",
 			path)
 	}

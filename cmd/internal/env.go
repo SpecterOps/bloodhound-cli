@@ -66,7 +66,7 @@ func setBloodHoundConfigDefaultValues() {
 	// Set some helpful aliases for common settings
 	bhEnv.RegisterAlias("default_password", "default_admin.password")
 
-	bhEnv.SetDefault("data_directory", GetDefaultDataDir())
+	bhEnv.SetDefault("config_directory", GetDefaultConfigDir())
 }
 
 // WriteBloodHoundEnvironmentVariables writes the current BloodHound configuration to the JSON config file, ensuring the file exists before writing. Logs a fatal error and exits if writing fails.
@@ -79,13 +79,13 @@ func WriteBloodHoundEnvironmentVariables() {
 }
 
 // checkJsonFileExistsAndCreate ensures that the BloodHound JSON configuration file exists in the designated directory
-// with proper permissions, creating the file and home directory if necessary. If the file or directory cannot be
+// with proper permissions, creating the file and config directory if necessary. If the file or directory cannot be
 // created or permissions are insufficient, the function logs a fatal error and terminates the program.
 func checkJsonFileExistsAndCreate() {
 	if !FileExists(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")) {
-		homeErr := MakeDataDir()
-		if homeErr != nil {
-			log.Fatalf("Error creating home directory: %s", homeErr)
+		configErr := MakeConfigDir()
+		if configErr != nil {
+			log.Fatalf("Error creating config directory: %s", configErr)
 		}
 
 		file, err := os.Create(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json"))
@@ -107,13 +107,13 @@ func checkJsonFileExistsAndCreate() {
 			log.Fatalf("Failed to write JSON to file: %v", err)
 		}
 	} else {
-		permCheck, permErr := CheckDataDir(GetBloodHoundDir())
+		permCheck, permErr := CheckConfigDir(GetBloodHoundDir())
 		if permErr != nil {
-			log.Fatalf("Error checking the permissions on the home directory: %s", permErr)
+			log.Fatalf("Error checking the permissions on the config directory: %s", permErr)
 		}
 
 		if !permCheck {
-			log.Fatalf("The permissions set on the home directory, %s, must be at least allow read and write for the current user (e.g., 0600).", GetBloodHoundDir())
+			log.Fatalf("The permissions set on the config directory, %s, must be at least allow read and write for the current user (e.g., 0600).", GetBloodHoundDir())
 		}
 	}
 }
