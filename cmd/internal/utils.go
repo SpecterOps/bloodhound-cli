@@ -80,7 +80,7 @@ func GetBloodHoundDir() string {
 	return bhEnv.GetString("config_directory")
 }
 
-// MakeConfigDir ensures the configured BloodHound config directory exists, creating it with permissions 0777 if necessary.
+// MakeConfigDir ensures the configured BloodHound config directory exists, creating it if necessary.
 // Returns an error if directory creation fails.
 func MakeConfigDir() error {
 	configDir := GetBloodHoundDir()
@@ -91,7 +91,6 @@ func MakeConfigDir() error {
 			return mkErr
 		}
 		log.Println("Successfully created the BloodHound config directory.")
-		log.Println("Note: The directory is open to all users (mask 0777). If you will be the only user, feel free to make adjustments.")
 	}
 
 	return nil
