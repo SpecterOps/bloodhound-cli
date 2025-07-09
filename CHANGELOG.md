@@ -8,19 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added support for a dedicated config directory to act as the configuration home for the JSON configuration file and Docker YAML files
-  * Added a `config_directory` value to the JSON configuration file to control the config directory path
-  * The default value is the user's XDG config home directory and `bloodhound`
-    * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
-      `~/Library/Application Support/bloodhound` on macOS, and \
-      `%LOCALAPPDATA%\bloodhound` on Windows
-    * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound, so we add to that directory if it exists
-  * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the config directory for the JSON and YAML files
-  * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
-  * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so the typical user mask of `0022` will set the permissions to `0755`
+* Added support for a dedicated config directory to act as the configuration home for the JSON configuration file and default Docker YAML files
+  * The directory is the user's XDG config home directory and `bloodhound`
+      * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
+        `~/Library/Application Support/bloodhound` on macOS, and \
+        `%LOCALAPPDATA%\bloodhound` on Windows
+      * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound
+    * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the config directory for the JSON and default YAML files
+    * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
+    * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so the typical user mask of `0022` will set the permissions to `0755`
+* Added a `config_directory` value to the JSON configuration file to control the config directory path
+  * Changing this path will change where BloodHound CLI looks for the Docker YAML files
+  * BloodHound CLI will continue to look in the default location for the JSON config file 
 * Added checks that ensure the configured directory will work as expected every time BloodHound CLI runs
   * The first check ensures the directory exists and creates the directory if it does not
   * The second check ensures the config directory has proper permissions that will allow BloodHound CLI to read and write
+* Added a `-f` or `--file` flag to override the location of the YAML file to use for Docker
+  * Providing a file path will override where BloodHound CLI looks for the YAML file
+  * e.g., `./bloodhound-cli -f /Users/Mable/BloodHound/custom-docker-compose.yml containers up`
 
 ### Changed
 
