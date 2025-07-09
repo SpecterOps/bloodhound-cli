@@ -4,17 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.7] - 2025-7-7
+## [0.1.7] - 2025-7-9
 
 ### Added
 
 * Added support for a dedicated config directory to act as the configuration home for the JSON configuration file and Docker YAML files
   * Added a `config_directory` value to the JSON configuration file to control the config directory path
   * The default value is the user's XDG config home directory and `bloodhound`
-    * i.e., the equivalent of `~/.config` on Unix, `~/Library/Application Support` on macOS, and  `%LOCALAPPDATA%` on Windows
-      * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
-        `~/Library/Application Support/bloodhound` on macOS, and \
-        `%LOCALAPPDATA%\bloodhound` on Windows
+    * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
+      `~/Library/Application Support/bloodhound` on macOS, and \
+      `%LOCALAPPDATA%\bloodhound` on Windows
     * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound, so we add to that directory if it exists
   * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the config directory for the JSON and YAML files
   * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
