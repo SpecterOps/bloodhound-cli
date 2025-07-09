@@ -171,6 +171,13 @@ func GetConfig(args []string) Configurations {
 
 // SetConfig sets the value of the specified key in the JSON config file.
 func SetConfig(key string, value string) {
+	// We do not support changing the `config_directory` at this time. We can explore that at a later time.
+	// Allowing it to be changed will cause the new directory to be created with a blank config file, so we disable the
+	// option here to avoid any confusion.
+	if strings.ToLower(key) == "config_directory" {
+		log.Fatalf("The config directory cannot be changed here, but you can use `--file` a different Docker YAML file to use.")
+	}
+
 	if strings.ToLower(value) == "true" {
 		bhEnv.Set(key, true)
 	} else if strings.ToLower(value) == "false" {
@@ -178,5 +185,6 @@ func SetConfig(key string, value string) {
 	} else {
 		bhEnv.Set(key, value)
 	}
+
 	WriteBloodHoundEnvironmentVariables()
 }
