@@ -27,5 +27,5 @@ func init() {
 func containersDown(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing down the BloodHound environment")
-	docker.RunDockerComposeDown(docker.GetYamlFilePath(dirOverride), volumes)
+	docker.RunDockerComposeDown(docker.GetYamlFilePath(fileOverride), volumes)
 }

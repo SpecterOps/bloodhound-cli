@@ -33,5 +33,5 @@ func init() {
 func uninstallBloodHound(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Starting BloodHound environment removal")
-	docker.RunDockerComposeUninstall(docker.GetYamlFilePath(dirOverride))
+	docker.RunDockerComposeUninstall(docker.GetYamlFilePath(fileOverride))
 }

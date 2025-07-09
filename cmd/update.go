@@ -22,5 +22,5 @@ func init() {
 func updateBloodHound(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Checking for BloodHound image updates...")
-	docker.RunDockerComposePull(docker.GetYamlFilePath(dirOverride))
+	docker.RunDockerComposePull(docker.GetYamlFilePath(fileOverride))
 }

@@ -37,5 +37,5 @@ func installBloodHound(cmd *cobra.Command, args []string) {
 		log.Fatalf("Error creating config directory: %v", configErr)
 	}
 	fmt.Println("[+] Starting BloodHound environment installation")
-	docker.RunDockerComposeInstall(docker.GetYamlFilePath(dirOverride))
+	docker.RunDockerComposeInstall(docker.GetYamlFilePath(fileOverride))
 }
