@@ -26,5 +26,5 @@ func init() {
 func buildContainers(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Starting build")
-	docker.RunDockerComposeUpgrade(docker.GetYamlFilePath())
+	docker.RunDockerComposeUpgrade(docker.GetYamlFilePath(dirOverride))
 }

@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+// Vars for global flags
+var dirOverride string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "bloodhound-cli",
@@ -26,4 +29,6 @@ func Execute() {
 func init() {
 	// Create or parse the Docker ``bloodhound.config.json`` file
 	env.ParseBloodHoundEnvironmentVariables()
+
+	rootCmd.PersistentFlags().StringVarP(&dirOverride, "file", "f", "", `Override the YAML file in the configured data directory and use a different YAML file for the container commands.`)
 }

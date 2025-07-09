@@ -23,5 +23,5 @@ func init() {
 func containersRestart(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Restarting the BloodHound environment")
-	docker.RunDockerComposeRestart(docker.GetYamlFilePath())
+	docker.RunDockerComposeRestart(docker.GetYamlFilePath(dirOverride))
 }

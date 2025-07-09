@@ -23,5 +23,5 @@ func init() {
 func containersStop(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Stopping the BloodHound environment")
-	docker.RunDockerComposeStop(docker.GetYamlFilePath())
+	docker.RunDockerComposeStop(docker.GetYamlFilePath(dirOverride))
 }

@@ -110,7 +110,27 @@ func CheckConfigDir(path string) (bool, error) {
 }
 
 // GetYamlFilePath joins and returns the directory path of the BloodHound config directory with the Docker Compose YAML file.
-func GetYamlFilePath() string {
+// If a user has provided the `-f` or `--file` flag with a string value, the function will return that filepath.
+func GetYamlFilePath(override string) string {
+	if override != "" {
+		log.Printf("Using the override filepath: %s", override)
+		fileInfo, err := os.Stat(override)
+		if err != nil {
+			if os.IsNotExist(err) {
+				log.Fatalf("The override path '%s' does not exist.\n", override)
+			} else {
+				log.Fatalf("There was an error checking the override path '%s': %v\n", override, err)
+			}
+		}
+		if fileInfo.IsDir() {
+			log.Fatalf("The provided override path '%s' is a directory instead of a YAML file.\n", override)
+		} else {
+			if !FileExists(override) {
+				log.Fatalf("Override filepaths does not exist: %s", override)
+			}
+		}
+		return override
+	}
 	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
 }
 

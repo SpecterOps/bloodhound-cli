@@ -23,5 +23,5 @@ func init() {
 func containersUp(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing up the BloodHound environment")
-	docker.RunDockerComposeUp(docker.GetYamlFilePath())
+	docker.RunDockerComposeUp(docker.GetYamlFilePath(dirOverride))
 }
