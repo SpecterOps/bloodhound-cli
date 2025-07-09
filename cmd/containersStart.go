@@ -19,8 +19,9 @@ func init() {
 	containersCmd.AddCommand(containersStartCmd)
 }
 
+// containersStart starts all stopped BloodHound Docker Compose services by invoking the appropriate Docker Compose command with the configuration file located in the BloodHound directory.
 func containersStart(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Starting the BloodHound environment")
-	docker.RunDockerComposeStart("docker-compose.yml")
+	docker.RunDockerComposeStart(docker.GetYamlFilePath(fileOverride))
 }

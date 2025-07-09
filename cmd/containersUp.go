@@ -19,8 +19,9 @@ func init() {
 	containersCmd.AddCommand(containersUpCmd)
 }
 
+// containersUp brings up the BloodHound container environment by evaluating Docker Compose status and running `docker compose up` with the BloodHound configuration.
 func containersUp(cmd *cobra.Command, args []string) {
 	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Bringing up the BloodHound environment")
-	docker.RunDockerComposeUp("docker-compose.yml")
+	docker.RunDockerComposeUp(docker.GetYamlFilePath(fileOverride))
 }

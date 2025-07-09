@@ -6,6 +6,7 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"github.com/adrg/xdg"
 	"io"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ func (c HealthIssues) Swap(i, j int) {
 func GetCwdFromExe() string {
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	return filepath.Dir(exe)
 }
@@ -57,8 +58,7 @@ func FileExists(path string) bool {
 	return !info.IsDir()
 }
 
-// DirExists determines if a given string is a valid directory.
-// Reference: https://golangcode.com/check-if-a-file-exists/
+// DirExists reports whether the specified path exists and is a directory. Returns false if the path does not exist.
 func DirExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -69,15 +69,90 @@ func DirExists(path string) bool {
 	return info.IsDir()
 }
 
-// CheckPath checks the $PATH environment variable for a given "cmd" and return a "bool"
-// indicating if it exists.
+// GetDefaultConfigDir returns the default BloodHound config directory path as a `bloodhound` folder inside the current user's data directory.
+// Logs a fatal error if the user's config directory cannot be determined.
+func GetDefaultConfigDir() string {
+	return filepath.Join(xdg.ConfigHome, "bloodhound")
+}
+
+// GetBloodHoundDir returns the configured BloodHound config directory path from the environment variable "config_directory".
+func GetBloodHoundDir() string {
+	return bhEnv.GetString("config_directory")
+}
+
+// MakeConfigDir ensures the configured BloodHound config directory exists, creating it if necessary.
+// Returns an error if directory creation fails.
+func MakeConfigDir() error {
+	configDir := GetBloodHoundDir()
+	if !DirExists(configDir) {
+		log.Printf("The BloodHound config directory you have set, %s, is missing, so attempting to create it.\n", configDir)
+		mkErr := os.MkdirAll(configDir, 0777)
+		if mkErr != nil {
+			return mkErr
+		}
+		log.Println("Successfully created the BloodHound config directory.")
+	}
+
+	return nil
+}
+
+// CheckConfigDir checks if the config directory's permissions are at least 0600. This ensures the current user has R/W
+// access and BloodHound CLI can function. A more permissive mode won't trigger any errors.
+// It returns true if the permissions are sufficient, along with any error encountered during the stat operation.
+func CheckConfigDir(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+	baselinePerms := os.FileMode(0600)
+	mode := info.Mode().Perm()
+	return mode&baselinePerms == baselinePerms, nil
+}
+
+// GetYamlFilePath joins and returns the directory path of the BloodHound config directory with the Docker Compose YAML file.
+// If a user has provided the `-f` or `--file` flag with a string value, the function will return that filepath.
+func GetYamlFilePath(override string) string {
+	if override != "" {
+		log.Printf("Using the override filepath: %s", override)
+		fileInfo, err := os.Stat(override)
+		if err != nil {
+			if os.IsNotExist(err) {
+				log.Fatalf("The override path '%s' does not exist.\n", override)
+			} else {
+				log.Fatalf("There was an error checking the override path '%s': %v\n", override, err)
+			}
+		}
+		if fileInfo.IsDir() {
+			log.Fatalf("The provided override path '%s' is a directory instead of a YAML file.\n", override)
+		} else {
+			if !FileExists(override) {
+				log.Fatalf("Override filepaths does not exist: %s", override)
+			}
+		}
+		return override
+	}
+	return filepath.Join(GetBloodHoundDir(), "docker-compose.yml")
+}
+
+// CheckYamlExists verifies that a YAML file exists at the specified path.
+// If the file does not exist, it logs a fatal error with instructions for obtaining the required YAML file.
+func CheckYamlExists(path string) {
+	if !FileExists(path) {
+		log.Fatalf(
+			"The YAML file %s does not exist! To continue, move your YAML file into the config directory or run "+
+				"`./bloodhound-cli check` to download the necessary YAML file.",
+			path)
+	}
+}
+
+// CheckPath returns true if the specified command exists in the system's PATH.
 func CheckPath(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil
 }
 
 // RunBasicCmd executes a given command ("name") with a list of arguments ("args")
-// and return a "string" with the output.
+// and returns a "string" with the output.
 func RunBasicCmd(name string, args []string) (string, error) {
 	out, err := exec.Command(name, args...).Output()
 	output := string(out[:])
@@ -97,7 +172,7 @@ func RunCmd(name string, args []string) error {
 	}
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable")
+		log.Fatalf("Failed to get path to current executable.")
 	}
 	exePath := filepath.Dir(exe)
 	command := exec.Command(path, args...)

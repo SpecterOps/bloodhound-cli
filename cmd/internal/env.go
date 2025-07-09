@@ -41,7 +41,7 @@ func (c Configurations) Swap(i, j int) {
 var bhEnv = viper.New()
 
 // Set sane defaults for a basic BloodHound deployment.
-// Defaults are geared towards a development environment.
+// setBloodHoundConfigDefaultValues sets default configuration values for BloodHound, including version, admin credentials, server settings, logging, TLS paths, and directory locations. Defaults are intended for development environments.
 func setBloodHoundConfigDefaultValues() {
 	bhEnv.SetDefault("version", 1)
 
@@ -65,9 +65,11 @@ func setBloodHoundConfigDefaultValues() {
 
 	// Set some helpful aliases for common settings
 	bhEnv.RegisterAlias("default_password", "default_admin.password")
+
+	bhEnv.SetDefault("config_directory", GetDefaultConfigDir())
 }
 
-// WriteBloodHoundEnvironmentVariables writes the environment variables to the JSON config file.
+// WriteBloodHoundEnvironmentVariables writes the current BloodHound configuration to the JSON config file, ensuring the file exists before writing. Logs a fatal error and exits if writing fails.
 func WriteBloodHoundEnvironmentVariables() {
 	checkJsonFileExistsAndCreate()
 	err := bhEnv.WriteConfig()
@@ -76,13 +78,20 @@ func WriteBloodHoundEnvironmentVariables() {
 	}
 }
 
-// checkJsonFileExistsAndCreate checks if the JSON file exists and creates it with an empty value, {}, if it doesn't.
+// checkJsonFileExistsAndCreate ensures that the BloodHound JSON configuration file exists in the designated directory
+// with proper permissions, creating the file and config directory if necessary. If the file or directory cannot be
+// created or permissions are insufficient, the function logs a fatal error and terminates the program.
 func checkJsonFileExistsAndCreate() {
-	if !FileExists(filepath.Join(GetCwdFromExe(), "bloodhound.config.json")) {
-		file, err := os.Create(filepath.Join(GetCwdFromExe(), "bloodhound.config.json"))
+	if !FileExists(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")) {
+		configErr := MakeConfigDir()
+		if configErr != nil {
+			log.Fatalf("Error creating config directory: %s", configErr)
+		}
+
+		file, err := os.Create(filepath.Join(GetBloodHoundDir(), "bloodhound.config.json"))
 
 		if err != nil {
-			log.Fatalf("The JSON config file doesn't exist and couldn't be created")
+			log.Fatalf("The JSON config file doesn't exist and couldn't be created.")
 		}
 
 		defer func(file *os.File) {
@@ -97,20 +106,28 @@ func checkJsonFileExistsAndCreate() {
 		if err := encoder.Encode(emptyJSON); err != nil {
 			log.Fatalf("Failed to write JSON to file: %v", err)
 		}
+	} else {
+		permCheck, permErr := CheckConfigDir(GetBloodHoundDir())
+		if permErr != nil {
+			log.Fatalf("Error checking the permissions on the config directory: %s", permErr)
+		}
+
+		if !permCheck {
+			log.Fatalf("The permissions set on the config directory, %s, must be at least allow read and write for the current user (e.g., 0600).", GetBloodHoundDir())
+		}
 	}
 }
 
-// ParseBloodHoundEnvironmentVariables attempts to find and open an existing JSON config file or create a new one.
-// If a JSON config file is found, load it into the Viper configuration.
-// If a JSON config file is not found, create a new one with default values.
-// Then write the final file with `WriteBloodHoundEnvironmentVariables()`.
+// ParseBloodHoundEnvironmentVariables initializes default configuration values, ensures the BloodHound config file and
+// directory exist with correct permissions, loads configuration from the JSON file and environment variables, and
+// writes the final configuration back to the file. The function terminates the program on critical errors.
 func ParseBloodHoundEnvironmentVariables() {
 	setBloodHoundConfigDefaultValues()
 	bhEnv.SetConfigName("bloodhound.config.json")
 	bhEnv.SetConfigType("json")
-	bhEnv.AddConfigPath(GetCwdFromExe())
+	bhEnv.AddConfigPath(GetBloodHoundDir())
 	bhEnv.AutomaticEnv()
-	// Check if expected JSON file exists
+	// Check if the expected JSON file exists
 	checkJsonFileExistsAndCreate()
 	// Try reading the env file
 	if err := bhEnv.ReadInConfig(); err != nil {
@@ -141,7 +158,7 @@ func GetConfig(args []string) Configurations {
 		setting := strings.ToLower(args[i])
 		val := bhEnv.GetString(setting)
 		if val == "" {
-			log.Fatalf("Config variable `%s` not found", setting)
+			log.Fatalf("Config variable `%s` not found.", setting)
 		} else {
 			values = append(values, Configuration{setting, val})
 		}
@@ -154,6 +171,13 @@ func GetConfig(args []string) Configurations {
 
 // SetConfig sets the value of the specified key in the JSON config file.
 func SetConfig(key string, value string) {
+	// We do not support changing the `config_directory` at this time. We can explore that at a later time.
+	// Allowing it to be changed will cause the new directory to be created with a blank config file, so we disable the
+	// option here to avoid any confusion.
+	if strings.ToLower(key) == "config_directory" {
+		log.Fatalf("The config directory cannot be changed here, but you can use `--file` a different Docker YAML file to use.")
+	}
+
 	if strings.ToLower(value) == "true" {
 		bhEnv.Set(key, true)
 	} else if strings.ToLower(value) == "false" {
@@ -161,5 +185,6 @@ func SetConfig(key string, value string) {
 	} else {
 		bhEnv.Set(key, value)
 	}
+
 	WriteBloodHoundEnvironmentVariables()
 }

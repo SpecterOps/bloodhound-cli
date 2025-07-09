@@ -14,10 +14,12 @@ var versionCmd = &cobra.Command{
 	Run:   displayVersion,
 }
 
+// init registers the version command with the root command, enabling the "version" CLI command.
 func init() {
 	rootCmd.AddCommand(versionCmd)
 }
 
+// displayVersion prints the BloodHound CLI version and build date to standard output.
 func displayVersion(cmd *cobra.Command, args []string) {
-	fmt.Printf("BloodHound-CLI ( %s, %s )\n", config.Version, config.BuildDate)
+	fmt.Printf("BloodHound-CLI (%s, %s)\n", config.Version, config.BuildDate)
 }

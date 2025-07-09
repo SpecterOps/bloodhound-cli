@@ -18,15 +18,14 @@ YAML files or move the binary without them, this command will prompt you to re-d
 	Run: evaluateBloodHound,
 }
 
+// init registers the checkCmd command with the root command, enabling the "check" CLI subcommand.
 func init() {
 	rootCmd.AddCommand(checkCmd)
 }
 
+// evaluateBloodHound checks the Docker Compose status and evaluates the environment, printing a confirmation message upon successful completion.
 func evaluateBloodHound(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus(true)
-	if err != nil {
-		return
-	}
+	docker.EvaluateDockerComposeStatus()
 	docker.EvaluateEnvironment()
 	fmt.Println("[+] Environment checks are complete!")
 }

@@ -26,15 +26,14 @@ The command performs the following steps:
 	Run: resetAdminPwd,
 }
 
+// init registers the resetpwd command with the root command for the CLI.
 func init() {
 	rootCmd.AddCommand(resetPwdCmd)
 }
 
+// resetAdminPwd resets the default admin password by orchestrating Docker Compose operations and invoking the password reset process.
 func resetAdminPwd(cmd *cobra.Command, args []string) {
-	err := docker.EvaluateDockerComposeStatus(true)
-	if err != nil {
-		return
-	}
+	docker.EvaluateDockerComposeStatus()
 	fmt.Println("[+] Resetting admin password")
-	docker.ResetAdminPassword("docker-compose.yml")
+	docker.ResetAdminPassword(docker.GetYamlFilePath(fileOverride))
 }

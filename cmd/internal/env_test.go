@@ -22,8 +22,9 @@ func TestBloodHoundEnvironmentVariables(t *testing.T) {
 	//defer quietTests()()
 
 	// Test parsing values and writing to the JSON config file
-	envFile := filepath.Join(GetCwdFromExe(), "bloodhound.config.json")
 	ParseBloodHoundEnvironmentVariables()
+	envFile := filepath.Join(GetBloodHoundDir(), "bloodhound.config.json")
+
 	assert.True(t, FileExists(envFile), "Expected the JSON file to exist")
 
 	// Test a default value
@@ -40,7 +41,7 @@ func TestBloodHoundEnvironmentVariables(t *testing.T) {
 	assert.Equal(t, len(format), 2, "`GetConfig()` with two valid variables should return a two values")
 
 	// Test ``GetConfigAll()``
-	assert.Equal(t, 12, CountConfigProperties(), "`GetConfigAll()` should return all values")
+	assert.Equal(t, 13, CountConfigProperties(), "`GetConfigAll()` should return all values")
 
 	// Test ``SetConfig()``
 	SetConfig("log_path", "bhce.log")
