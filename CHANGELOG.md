@@ -10,13 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added support for a dedicated config directory to act as the configuration home for the JSON configuration file and default Docker YAML files
   * The directory is the user's XDG config home directory and `bloodhound`
-      * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
-        `~/Library/Application Support/bloodhound` on macOS, and \
-        `%LOCALAPPDATA%\bloodhound` on Windows
-      * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound
-    * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the config directory for the JSON and default YAML files
-    * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
-    * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so the typical user mask of `0022` will set the permissions to `0755`
+    * i.e., the equivalent of `~/.config/bloodhound` on Unix, \
+      `~/Library/Application Support/bloodhound` on macOS, and \
+      `%LOCALAPPDATA%\bloodhound` on Windows
+    * We use a lowercase `bloodhound` to match the directory used by older installations of BloodHound
+  * You can place BloodHound CLI anywhere and run it from any location, and it will always look in the config directory for the JSON and default YAML files
+  * The CLI creates the directory with a `0777` permissions mask so it is accessible to all BloodHound users in multi-user environments
+  * The permissions follow your [umask](https://man7.org/linux/man-pages/man2/umask.2.html), so the typical user mask of `0022` will set the permissions to `0755`
 * Added a `config_directory` value to the JSON configuration file to control the config directory path
   * Changing this path will change where BloodHound CLI looks for the Docker YAML files
   * BloodHound CLI will continue to look in the default location for the JSON config file 
