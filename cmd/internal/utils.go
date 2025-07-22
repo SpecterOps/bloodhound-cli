@@ -311,6 +311,9 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	if resp.Body != nil {
 		defer resp.Body.Close()
 	}
+	if resp.StatusCode != http.StatusOK {
+		return "", "", fmt.Errorf("unexpected HTTP status: %d", resp.StatusCode)
+	}
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
 		return "", "", readErr
@@ -332,9 +335,7 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	}
 	date, parseErr := time.Parse(time.RFC3339, publishedAt)
 	if parseErr != nil {
-		// Fallback: use raw string if parsing fails
-		dateStr := publishedAt
-		output = fmt.Sprintf("BloodHound CLI (published at: %s)", dateStr)
+		output = fmt.Sprintf("BloodHound CLI (published at: %s)", publishedAt)
 	} else {
 		tagNameRaw, ok := githubJson["tag_name"]
 		if !ok {
@@ -358,5 +359,6 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	if !ok {
 		return "", "", fmt.Errorf("'html_url' is not a string")
 	}
+	output = strings.TrimRight(output, "\n")
 	return output, url, nil
 }
