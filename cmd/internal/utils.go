@@ -5,6 +5,7 @@ package internal
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"github.com/adrg/xdg"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // HealthIssue is a custom type for storing healthcheck output.
@@ -294,4 +296,68 @@ func DownloadFile(url string, filepath string) error {
 	}
 
 	return nil
+}
+
+// GetRemoteBloodHoundCliVersion fetches the latest BloodHound CLI version from GitHub's API.
+func GetRemoteBloodHoundCliVersion() (string, string, error) {
+	var output string
+
+	baseUrl := "https://api.github.com/repos/SpecterOps/bloodhound-cli/releases/latest"
+	client := http.Client{Timeout: time.Second * 10}
+	resp, err := client.Get(baseUrl)
+	if err != nil {
+		return "", "", err
+	}
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", "", fmt.Errorf("unexpected HTTP status: %d", resp.StatusCode)
+	}
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return "", "", readErr
+	}
+
+	var githubJson map[string]interface{}
+	jsonErr := json.Unmarshal(body, &githubJson)
+	if jsonErr != nil {
+		return "", "", jsonErr
+	}
+
+	publishedAtRaw, ok := githubJson["published_at"]
+	if !ok {
+		return "", "", fmt.Errorf("missing 'published_at' in GitHub response")
+	}
+	publishedAt, ok := publishedAtRaw.(string)
+	if !ok {
+		return "", "", fmt.Errorf("'published_at' is not a string")
+	}
+	date, parseErr := time.Parse(time.RFC3339, publishedAt)
+	if parseErr != nil {
+		output = fmt.Sprintf("BloodHound CLI (published at: %s)", publishedAt)
+	} else {
+		tagNameRaw, ok := githubJson["tag_name"]
+		if !ok {
+			return "", "", fmt.Errorf("missing 'tag_name' in GitHub response")
+		}
+		tagName, ok := tagNameRaw.(string)
+		if !ok {
+			return "", "", fmt.Errorf("'tag_name' is not a string")
+		}
+		output = fmt.Sprintf(
+			"BloodHound CLI %s (%02d %s %d)",
+			tagName, date.Day(), date.Month().String(), date.Year(),
+		)
+	}
+
+	urlRaw, ok := githubJson["html_url"]
+	if !ok {
+		return "", "", fmt.Errorf("missing 'html_url' in GitHub response")
+	}
+	url, ok := urlRaw.(string)
+	if !ok {
+		return "", "", fmt.Errorf("'html_url' is not a string")
+	}
+	return output, url, nil
 }

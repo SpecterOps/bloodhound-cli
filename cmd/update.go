@@ -9,8 +9,8 @@ import (
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update the BloodHound container images if an update is available",
-	Long:  `Updates the BloodHound container images if an update is available.`,
+	Short: "Update the BloodHound container images if any updates are available",
+	Long:  `Updates the BloodHound container images if any updates are available.`,
 	Run:   updateBloodHound,
 }
 

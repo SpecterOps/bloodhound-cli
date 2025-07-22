@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -29,4 +30,15 @@ func TestRunCmd(t *testing.T) {
 func TestContains(t *testing.T) {
 	assert.True(t, Contains([]string{"a", "b", "c"}, "b"), "Expected `Contains()` to return true")
 	assert.False(t, Contains([]string{"a", "b", "c"}, "d"), "Expected `Contains()` to return false")
+}
+
+func TestGetRemoteBloodHoundCliVersion(t *testing.T) {
+	// Test reading the version data from GitHub's API
+	version, _, err := GetRemoteBloodHoundCliVersion()
+	assert.NoError(t, err, "Expected `GetRemoteBloodHoundCliVersion()` to return no error")
+	assert.True(
+		t,
+		strings.Contains(version, "BloodHound CLI v"),
+		"Expected `GetRemoteBloodHoundCliVersion()` to return a string containing `BloodHound CLI v...`",
+	)
 }
