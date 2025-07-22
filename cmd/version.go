@@ -35,15 +35,17 @@ func compareCliVersions(cmd *cobra.Command, args []string) error {
 
 	fmt.Println("[+] Fetching latest version information:")
 
-	remoteVersion, htmlUrl, remoteErr := utils.GetRemoteBloodHoundCliVersion()
-	if remoteErr != nil {
-		return remoteErr
-	}
 	if len(config.BuildDate) == 0 {
 		fmt.Fprintf(writer, "\nLocal Version\tBloodHound CLI %s", config.Version)
 	} else {
 		fmt.Fprintf(writer, "\nLocal Version\tBloodHound CLI %s (%s)", config.Version, config.BuildDate)
 	}
+
+	remoteVersion, htmlUrl, remoteErr := utils.GetRemoteBloodHoundCliVersion()
+	if remoteErr != nil {
+		return remoteErr
+	}
+
 	fmt.Fprintf(writer, "\nLatest Release\t%s\n", remoteVersion)
 	fmt.Fprintf(writer, "Latest Download URL\t%s\n", htmlUrl)
 
