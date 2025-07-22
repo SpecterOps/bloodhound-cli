@@ -5,6 +5,7 @@ package internal
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"github.com/adrg/xdg"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // HealthIssue is a custom type for storing healthcheck output.
@@ -294,4 +296,39 @@ func DownloadFile(url string, filepath string) error {
 	}
 
 	return nil
+}
+
+// GetRemoteBloodHoundCliVersion fetches the latest Ghostwriter CLI version from GitHub's API.
+func GetRemoteBloodHoundCliVersion() (string, string, error) {
+	var output string
+
+	baseUrl := "https://api.github.com/repos/SpecterOps/bloodhound-cli/releases/latest"
+	client := http.Client{Timeout: time.Second * 2}
+	resp, err := client.Get(baseUrl)
+	if err != nil {
+		return "", "", err
+	}
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return "", "", readErr
+	}
+
+	var githubJson map[string]interface{}
+	jsonErr := json.Unmarshal(body, &githubJson)
+	if jsonErr != nil {
+		return "", "", jsonErr
+	}
+
+	publishedAt := githubJson["published_at"].(string)
+	date, _ := time.Parse(time.RFC3339, publishedAt)
+	output = fmt.Sprintf(
+		"%s (%02d %s %d)\n",
+		githubJson["tag_name"], date.Day(), date.Month().String(), date.Year(),
+	)
+	url := githubJson["html_url"].(string)
+
+	return output, url, nil
 }
