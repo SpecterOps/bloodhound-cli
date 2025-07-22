@@ -325,7 +325,7 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	publishedAt := githubJson["published_at"].(string)
 	date, _ := time.Parse(time.RFC3339, publishedAt)
 	output = fmt.Sprintf(
-		"%s (%02d %s %d)\n",
+		"BloodHound CLI %s (%02d %s %d)\n",
 		githubJson["tag_name"], date.Day(), date.Month().String(), date.Year(),
 	)
 	url := githubJson["html_url"].(string)
