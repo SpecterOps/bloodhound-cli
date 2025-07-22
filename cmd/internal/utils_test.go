@@ -35,7 +35,7 @@ func TestContains(t *testing.T) {
 func TestGetRemoteBloodHoundCliVersion(t *testing.T) {
 	// Test reading the version data from GitHub's API
 	version, _, err := GetRemoteBloodHoundCliVersion()
-	assert.Equal(t, nil, err, "Expected `GetRemoteBloodHoundCliVersion()` to return no error")
+	assert.NoError(t, err, "Expected `GetRemoteBloodHoundCliVersion()` to return no error")
 	assert.True(
 		t,
 		strings.Contains(version, "BloodHound CLI v"),

@@ -303,7 +303,7 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	var output string
 
 	baseUrl := "https://api.github.com/repos/SpecterOps/bloodhound-cli/releases/latest"
-	client := http.Client{Timeout: time.Second * 2}
+	client := http.Client{Timeout: time.Second * 10}
 	resp, err := client.Get(baseUrl)
 	if err != nil {
 		return "", "", err
@@ -359,6 +359,5 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	if !ok {
 		return "", "", fmt.Errorf("'html_url' is not a string")
 	}
-	output = strings.TrimRight(output, "\n")
 	return output, url, nil
 }
