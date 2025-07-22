@@ -298,7 +298,7 @@ func DownloadFile(url string, filepath string) error {
 	return nil
 }
 
-// GetRemoteBloodHoundCliVersion fetches the latest Ghostwriter CLI version from GitHub's API.
+// GetRemoteBloodHoundCliVersion fetches the latest BloodHound CLI version from GitHub's API.
 func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	var output string
 
@@ -325,7 +325,7 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 	publishedAt := githubJson["published_at"].(string)
 	date, _ := time.Parse(time.RFC3339, publishedAt)
 	output = fmt.Sprintf(
-		"BloodHound CLI %s (%02d %s %d)\n",
+		"BloodHound CLI %s (%02d %s %d)",
 		githubJson["tag_name"], date.Day(), date.Month().String(), date.Year(),
 	)
 	url := githubJson["html_url"].(string)

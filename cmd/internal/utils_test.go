@@ -32,13 +32,13 @@ func TestContains(t *testing.T) {
 	assert.False(t, Contains([]string{"a", "b", "c"}, "d"), "Expected `Contains()` to return false")
 }
 
-func TestGetRemoteGhostwriterCliVersion(t *testing.T) {
+func TestGetRemoteBloodHoundCliVersion(t *testing.T) {
 	// Test reading the version data from GitHub's API
 	version, _, err := GetRemoteBloodHoundCliVersion()
 	assert.Equal(t, nil, err, "Expected `GetRemoteBloodHoundCliVersion()` to return no error")
 	assert.True(
 		t,
 		strings.Contains(version, "BloodHound CLI v"),
-		"Expected `GetRemoteBloodHoundCliVersion()` to return a string containing `BloodHound CLI CLI v...`",
+		"Expected `GetRemoteBloodHoundCliVersion()` to return a string containing `BloodHound CLI v...`",
 	)
 }
