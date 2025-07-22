@@ -322,13 +322,41 @@ func GetRemoteBloodHoundCliVersion() (string, string, error) {
 		return "", "", jsonErr
 	}
 
-	publishedAt := githubJson["published_at"].(string)
-	date, _ := time.Parse(time.RFC3339, publishedAt)
-	output = fmt.Sprintf(
-		"BloodHound CLI %s (%02d %s %d)",
-		githubJson["tag_name"], date.Day(), date.Month().String(), date.Year(),
-	)
-	url := githubJson["html_url"].(string)
+	publishedAtRaw, ok := githubJson["published_at"]
+	if !ok {
+		return "", "", fmt.Errorf("missing 'published_at' in GitHub response")
+	}
+	publishedAt, ok := publishedAtRaw.(string)
+	if !ok {
+		return "", "", fmt.Errorf("'published_at' is not a string")
+	}
+	date, parseErr := time.Parse(time.RFC3339, publishedAt)
+	if parseErr != nil {
+		// Fallback: use raw string if parsing fails
+		dateStr := publishedAt
+		output = fmt.Sprintf("BloodHound CLI (published at: %s)", dateStr)
+	} else {
+		tagNameRaw, ok := githubJson["tag_name"]
+		if !ok {
+			return "", "", fmt.Errorf("missing 'tag_name' in GitHub response")
+		}
+		tagName, ok := tagNameRaw.(string)
+		if !ok {
+			return "", "", fmt.Errorf("'tag_name' is not a string")
+		}
+		output = fmt.Sprintf(
+			"BloodHound CLI %s (%02d %s %d)",
+			tagName, date.Day(), date.Month().String(), date.Year(),
+		)
+	}
 
+	urlRaw, ok := githubJson["html_url"]
+	if !ok {
+		return "", "", fmt.Errorf("missing 'html_url' in GitHub response")
+	}
+	url, ok := urlRaw.(string)
+	if !ok {
+		return "", "", fmt.Errorf("'html_url' is not a string")
+	}
 	return output, url, nil
 }
