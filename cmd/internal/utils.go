@@ -172,7 +172,10 @@ func RunCmd(name string, args []string) error {
 	if err != nil {
 		log.Fatalf("`%s` is not installed or not available in the current PATH", name)
 	}
-	exe, _ := os.Executable()
+	exe, err := os.Executable()
+	if err != nil {
+		log.Fatalf("Failed to get path to current executable: %v", err)
+	}
 	exePath := filepath.Dir(exe)
 
 	cmd := exec.Command(path, args...)
