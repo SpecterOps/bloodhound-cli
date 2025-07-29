@@ -7,7 +7,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/adrg/xdg"
 	"io"
 	"log"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/adrg/xdg"
 )
 
 // HealthIssue is a custom type for storing healthcheck output.
@@ -164,53 +165,26 @@ func RunBasicCmd(name string, args []string) (string, error) {
 // RunCmd executes a given command ("name") with a list of arguments ("args")
 // and return stdout and stderr buffers.
 func RunCmd(name string, args []string) error {
-	// If the command is ``docker``, prepend ``compose`` to the args
 	if name == "docker" {
 		args = append([]string{"compose"}, args...)
 	}
 	path, err := exec.LookPath(name)
 	if err != nil {
-		log.Fatalf("`%s` is not installed or not available in the current PATH variable", name)
+		log.Fatalf("`%s` is not installed or not available in the current PATH", name)
 	}
 	exe, err := os.Executable()
 	if err != nil {
-		log.Fatalf("Failed to get path to current executable.")
+		log.Fatalf("Failed to get path to current executable: %v", err)
 	}
 	exePath := filepath.Dir(exe)
-	command := exec.Command(path, args...)
-	command.Dir = exePath
 
-	stdout, err := command.StdoutPipe()
-	if err != nil {
-		log.Fatalf("Failed to get stdout pipe for running `%s`", name)
-	}
-	stderr, err := command.StderrPipe()
-	if err != nil {
-		log.Fatalf("Failed to get stderr pipe for running `%s`", name)
-	}
+	cmd := exec.Command(path, args...)
+	cmd.Dir = exePath
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
-	stdoutScanner := bufio.NewScanner(stdout)
-	stderrScanner := bufio.NewScanner(stderr)
-	go func() {
-		for stdoutScanner.Scan() {
-			fmt.Printf("%s\n", stdoutScanner.Text())
-		}
-	}()
-	go func() {
-		for stderrScanner.Scan() {
-			fmt.Printf("%s\n", stderrScanner.Text())
-		}
-	}()
-	err = command.Start()
-	if err != nil {
-		log.Fatalf("Error trying to start `%s`: %v\n", name, err)
-	}
-	err = command.Wait()
-	if err != nil {
-		fmt.Printf("[-] Error from `%s`: %v\n", name, err)
-		return err
-	}
-	return nil
+	return cmd.Run()
 }
 
 // Contains checks if a slice of strings ("slice" parameter) contains a given
