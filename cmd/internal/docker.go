@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 )
 
 // Vars for tracking the list of BloodHound images
@@ -20,7 +21,7 @@ var (
 	devImages = []string{
 		"bhce_bloodhound", "bhce_neo4j", "bhce_postgres",
 	}
-	// Default root command for Docker commands
+	// Default root command for Docker commands, will fallback to Podman if Docker is not found
 	dockerCmd = "docker"
 	// URLs for the BloodHound compose files
 	devYaml  = "docker-compose.dev.yml"
@@ -65,17 +66,23 @@ func EvaluateDockerComposeStatus() {
 	// Check for ``docker`` first because it's required for everything to come
 	dockerExists := CheckPath("docker")
 	if !dockerExists {
-		log.Fatalln("Docker is not installed on this system, so please install Docker and try again.")
+		podmanExists := CheckPath("podman")
+		if podmanExists {
+			fmt.Println("[+] Docker is not installed, but Podman is installed. Using Podman as a Docker alternative.")
+			dockerCmd = "podman"
+		} else {
+			log.Fatalln("Docker is not installed on this system, so please install Docker and try again.")
+		}
 	}
 
 	// Check if the Docker Engine is running
-	_, engineErr := RunBasicCmd("docker", []string{"info"})
+	_, engineErr := RunBasicCmd(dockerCmd, []string{"info"})
 	if engineErr != nil {
 		log.Fatalln("Docker is installed on this system, but the daemon is not running.")
 	}
 
 	// Check for the ``compose`` plugin as our first choice
-	_, composeErr := RunBasicCmd("docker", []string{"compose", "version"})
+	_, composeErr := RunBasicCmd(dockerCmd, []string{"compose", "version"})
 	if composeErr != nil {
 		fmt.Println("[+] The `compose` plugin is not installed, so we'll try the deprecated `docker-compose` script")
 		composeScriptExists := CheckPath("docker-compose")
