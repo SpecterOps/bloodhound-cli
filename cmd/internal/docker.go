@@ -71,14 +71,14 @@ func EvaluateDockerComposeStatus() {
 			fmt.Println("[+] Docker is not installed, but Podman is installed. Using Podman as a Docker alternative.")
 			dockerCmd = "podman"
 		} else {
-			log.Fatalln("Docker is not installed on this system, so please install Docker and try again.")
+			log.Fatalln("Neither Docker nor Podman is installed on this system, so please install Docker or Podman (in Docker compatibility mode) and try again.")
 		}
 	}
 
 	// Check if the Docker Engine is running
 	_, engineErr := RunBasicCmd(dockerCmd, []string{"info"})
 	if engineErr != nil {
-		log.Fatalln("Docker is installed on this system, but the daemon is not running.")
+		log.Fatalf("%s is installed on this system, but the daemon is not running or access was denied.", dockerCmd)
 	}
 
 	// Check for the ``compose`` plugin as our first choice
