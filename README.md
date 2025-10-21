@@ -10,6 +10,8 @@
 
 Golang code for the `bloodhound-cli` binary in [BloodHound](https://github.com/SpecterOps/BloodHound). This binary provides control for various aspects of BloodHound's configuration.
 
+BloodHound CLI is compatible with Docker Compose v2 and Podman. If using Podman, configure [Docker compatibility mode](https://podman-desktop.io/docs/migrating-from-docker/managing-docker-compatibility).
+
 ## Usage
 
 Execute `./bloodhound-cli help` for usage information (see below). 
