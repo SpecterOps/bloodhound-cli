@@ -59,7 +59,7 @@ func (c Containers) Swap(i, j int) {
 }
 
 // EvaluateDockerComposeStatus checks if Docker and Docker Compose are installed and operational on the system.
-// It verifies the presence of the Docker CLI, ensures the Docker daemon is running, and checks for either the Docker Compose plugin or the legacy docker-compose script, setting the global dockerCmd variable accordingly.
+// It verifies the presence of the Docker CLI, ensures the Docker daemon is running, and checks for either the Docker Compose plugin or Podman, setting the global dockerCmd variable accordingly.
 // Returns an error if all checks pass; otherwise, the function logs a fatal error and terminates the process.
 func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
@@ -84,13 +84,13 @@ func EvaluateDockerComposeStatus() {
 	// Check for the ``compose`` plugin as our first choice
 	_, composeErr := RunBasicCmd(dockerCmd, []string{"compose", "version"})
 	if composeErr != nil {
-		fmt.Println("[+] The `compose` plugin is not installed, so we'll try the deprecated `docker-compose` script")
+		// Check if the deprecated v1 script is installed
 		composeScriptExists := CheckPath("docker-compose")
 		if composeScriptExists {
-			fmt.Println("[+] The `docker-compose` script is installed, so we'll use that instead")
-			dockerCmd = "docker-compose"
+			fmt.Println("[!] The deprecated `docker-compose` v1 script was detected on your system")
+			fmt.Println("[!] Docker has deprecated v1 and this CLI tool no longer supports it")
+			log.Fatalln("Please upgrade to Docker Compose v2 and try again: https://docs.docker.com/compose/install/")
 		} else {
-			fmt.Println("[+] The `docker-compose` script is also not installed or not in the PATH")
 			log.Fatalln("Docker Compose is not installed, so please install it and try again: https://docs.docker.com/compose/install/")
 		}
 	}
