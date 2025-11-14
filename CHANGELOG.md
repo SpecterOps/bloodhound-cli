@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-14
+
+### Changed
+
+* Updated the Docker client to the latest to ensure continued compatibility with Docker v29 and later
+  * Docker v29 deprecated support for the Docker API v1.41 and earlier
+  * This does not impact most commands for containers (e.g., `up`, `build`), but a few utility commands used older API call for container information
+
+### Removed
+
+* Removed support for the deprecated `docker-compose` v1 script
+  * Docker has deprecated this version and marked it as end of life as of July 2022
+  * Future features of BloodHound CLI cannot support v1, so it is time to remove it to avoid confusion
+  * All users should be updated to at least v2.x
+  * If someone needs v1 and absolutely cannot upgrade, support for v1 remains in older BloodHound CLI binaries available from past releases
+
 ## [0.1.9] - 2025-10-21
 
 ### Added
