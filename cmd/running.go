@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	docker "github.com/SpecterOps/BloodHound_CLI/cmd/internal"
+	"github.com/spf13/cobra"
 )
 
 // runningCmd represents the running command
@@ -46,8 +47,10 @@ func displayRunning(cmd *cobra.Command, args []string) {
 			for _, port := range container.Ports {
 				var portString string
 
-				if port.IP != "" {
+				if port.IP.IsValid() {
 					portString = fmt.Sprintf("%s:", port.IP)
+				} else {
+					portString = ""
 				}
 				if port.PrivatePort != 0 {
 					portString += fmt.Sprintf("%d", port.PrivatePort)
