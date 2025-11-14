@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Updated the Docker client to the latest to ensure continued compatibility with Docker v29 and later
+* Updated the Docker client to the latest version to ensure continued compatibility with Docker v29 and later
   * Docker v29 deprecated support for the Docker API v1.41 and earlier
-  * This does not impact most commands for containers (e.g., `up`, `build`), but a few utility commands used older API call for container information
+  * This does not impact most commands for containers (e.g., `up`, `build`), but a few utility commands used older API calls for container information
 
 ### Removed
 
