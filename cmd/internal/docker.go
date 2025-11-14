@@ -58,9 +58,9 @@ func (c Containers) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-// EvaluateDockerComposeStatus checks if Docker and Docker Compose are installed and operational on the system.
-// It verifies the presence of the Docker CLI, ensures the Docker daemon is running, and checks for either the Docker Compose plugin or Podman, setting the global dockerCmd variable accordingly.
-// Returns an error if all checks pass; otherwise, the function logs a fatal error and terminates the process.
+// EvaluateDockerComposeStatus checks if Docker (or Podman in Docker compatibility mode) and the Docker Compose plugin are installed and operational.
+// It verifies the presence of the CLI, ensures the daemon is running, and sets the global dockerCmd variable to either `docker` or `podman`.
+// The function exits fatally via log.Fatal* if any requirement is not met; otherwise it returns normally.
 func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
