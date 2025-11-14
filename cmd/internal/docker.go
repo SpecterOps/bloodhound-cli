@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 )
 
 // Vars for tracking the list of BloodHound images
@@ -36,7 +36,7 @@ type Container struct {
 	ID     string
 	Image  string
 	Status string
-	Ports  []types.Port
+	Ports  []container.PortSummary
 	Name   string
 }
 
@@ -58,9 +58,9 @@ func (c Containers) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-// EvaluateDockerComposeStatus checks if Docker and Docker Compose are installed and operational on the system.
-// It verifies the presence of the Docker CLI, ensures the Docker daemon is running, and checks for either the Docker Compose plugin or the legacy docker-compose script, setting the global dockerCmd variable accordingly.
-// Returns an error if all checks pass; otherwise, the function logs a fatal error and terminates the process.
+// EvaluateDockerComposeStatus checks if Docker (or Podman in Docker compatibility mode) and the Docker Compose plugin are installed and operational.
+// It verifies the presence of the CLI, ensures the daemon is running, and sets the global dockerCmd variable to either `docker` or `podman`.
+// The function exits fatally via log.Fatal* if any requirement is not met; otherwise it returns normally.
 func EvaluateDockerComposeStatus() {
 	fmt.Println("[+] Checking the status of Docker and the Compose plugin...")
 	// Check for ``docker`` first because it's required for everything to come
@@ -84,13 +84,13 @@ func EvaluateDockerComposeStatus() {
 	// Check for the ``compose`` plugin as our first choice
 	_, composeErr := RunBasicCmd(dockerCmd, []string{"compose", "version"})
 	if composeErr != nil {
-		fmt.Println("[+] The `compose` plugin is not installed, so we'll try the deprecated `docker-compose` script")
+		// Check if the deprecated v1 script is installed
 		composeScriptExists := CheckPath("docker-compose")
 		if composeScriptExists {
-			fmt.Println("[+] The `docker-compose` script is installed, so we'll use that instead")
-			dockerCmd = "docker-compose"
+			fmt.Println("[!] The deprecated `docker-compose` v1 script was detected on your system")
+			fmt.Println("[!] Docker has deprecated v1 and this CLI tool no longer supports it")
+			log.Fatalln("Please upgrade to Docker Compose v2 and try again: https://docs.docker.com/compose/install/")
 		} else {
-			fmt.Println("[+] The `docker-compose` script is also not installed or not in the PATH")
 			log.Fatalln("Docker Compose is not installed, so please install it and try again: https://docs.docker.com/compose/install/")
 		}
 	}
@@ -288,19 +288,19 @@ func RunDockerComposePull(yaml string) {
 // FetchLogs fetches logs from the container with the specified "name" label ("containerName" parameter).
 func FetchLogs(containerName string, lines string) []string {
 	var logs []string
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := client.New(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatalf("Failed to get client in logs: %v", err)
 	}
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := cli.ContainerList(context.Background(), client.ContainerListOptions{})
 	if err != nil {
 		log.Fatalf("Failed to get container list: %v", err)
 	}
-	if len(containers) > 0 {
-		for _, container := range containers {
+	if len(containers.Items) > 0 {
+		for _, container := range containers.Items {
 			if container.Labels["name"] == containerName || containerName == "all" || container.Labels["name"] == "bhce_"+containerName {
 				logs = append(logs, fmt.Sprintf("\n*** Logs for `%s` ***\n\n", container.Labels["name"]))
-				reader, err := cli.ContainerLogs(context.Background(), container.ID, types.ContainerLogsOptions{
+				reader, err := cli.ContainerLogs(context.Background(), container.ID, client.ContainerLogsOptions{
 					ShowStdout: true,
 					ShowStderr: true,
 					Tail:       lines,
@@ -334,18 +334,18 @@ func FetchLogs(containerName string, lines string) []string {
 func GetRunning() Containers {
 	var running Containers
 
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := client.New(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatalf("Failed to get client connection to Docker: %v", err)
 	}
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{
+	containers, err := cli.ContainerList(context.Background(), client.ContainerListOptions{
 		All: false,
 	})
 	if err != nil {
 		log.Fatalf("Failed to get container list from Docker: %v", err)
 	}
-	if len(containers) > 0 {
-		for _, container := range containers {
+	if len(containers.Items) > 0 {
+		for _, container := range containers.Items {
 			if Contains(devImages, container.Labels["name"]) || Contains(prodImages, container.Labels["name"]) {
 				running = append(running, Container{
 					container.ID, container.Image, container.Status, container.Ports, container.Labels["name"],
