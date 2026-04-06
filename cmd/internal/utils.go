@@ -54,9 +54,7 @@ func GetCwdFromExe() string {
 func FileExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
+		return false
 	}
 	return !info.IsDir()
 }
@@ -65,9 +63,7 @@ func FileExists(path string) bool {
 func DirExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
+		return false
 	}
 	return info.IsDir()
 }
